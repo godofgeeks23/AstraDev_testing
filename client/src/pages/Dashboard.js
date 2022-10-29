@@ -3,6 +3,12 @@ import { isExpired, decodeToken } from "react-jwt";
 import { useNavigate } from 'react-router-dom';
 import '../App.css'
 
+import Container from 'react-bootstrap/Container';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import NavDropdown from 'react-bootstrap/NavDropdown';
+
+
 const logout = () => {
     localStorage.removeItem('token');
     window.location.href = '/login'
@@ -57,13 +63,26 @@ const Dashboard = () => {
         }
     }, [])
 
-    return (<h1>
-        Hello {quote} <br />
-        Welcome to Dashboard of ReconAID!
-        <br />
-        <br />
-        <button onClickCapture={logout}>logout user</button>
-    </h1>)
+    return (<div className='dashboardbody end-0 start-0 top-0 position-absolute'>
+
+<Navbar bg="dark" variant="dark" expand="lg" className=''>
+      <Container>
+        <Navbar.Brand href="#home">Astra</Navbar.Brand>
+        {/* <Navbar.Toggle aria-controls="basic-navbar-nav" /> */}
+        {/* <Navbar.Collapse id="basic-navbar-nav"> */}
+          <Nav className="me-auto">
+            <Nav.Link href="#home">Welcome, {quote}</Nav.Link>
+            <Nav.Link href="#home">Assets</Nav.Link>
+            <Nav.Link href="#link">Team</Nav.Link>
+            <Nav.Link href="#link">Invite</Nav.Link>
+            <Nav.Link onClick={logout}>Logout</Nav.Link>
+          </Nav>
+        {/* </Navbar.Collapse> */}
+      </Container>
+    </Navbar>
+
+        {/* <button onClickCapture={logout}>logout user</button> */}
+    </div>)
 }
 
 export default Dashboard
