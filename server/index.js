@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
 const bcrypt = require('bcryptjs')
 const validator = require('validator');
+const asset = require('./models/asset.model')
+const vulnerability = require('./models/vulnerability.model')
 
 dotenv.config()
 
@@ -130,4 +132,45 @@ app.post('/api/quote', async (req, res) => {
 
 app.listen(1337, () => {
 	console.log("Server startetd on 1337")
-}) 
+})
+
+
+app.post('/api/add_asset', async (req, res) => {
+	console.log(req.body)
+	try {
+		const new_asset = await asset.create({
+			title: req.body.title,
+			type:  req.body.type,
+			asset_id: req.body.asset_id,
+			target: req.body.target,
+			created_date: req.body.created_date,
+			description: req.body.description,
+		})
+		console.log("asset added successfully!");
+		res.json({ status: "ok"})
+	} catch (error) {
+		res.json({ status: "error", error })
+	}
+})
+
+
+app.post('/api/add_vuln', async (req, res) => {
+	console.log(req.body)
+	try {
+		const new_vuln = await vulnerability.create({
+			type: req.body.type,
+			name: req.body.name,
+			created_date: req.body.created_date,
+			severity: req.body.severity,
+			url: req.body.url,
+			status: req.body.status,
+			parent_asset: req.body.parent_asset,
+			id: req.body.id,
+			description: req.body.description,
+		})
+		console.log("vulnerability added successfully!");
+		res.json({ status: "ok"})
+	} catch (error) {
+		res.json({ status: "error", error })
+	}
+})
