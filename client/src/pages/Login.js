@@ -41,7 +41,7 @@ function App() {
 
 	return (
 		<div className='login_container p-5 m-5 bg-dark'>
-			<div className='heading1'><h1>Login</h1></div>
+			<h1 className='text-center p-3'>Login</h1>
 			<Form onSubmit={loginUser}>
 				<Form.Group className="mb-3" controlId="formBasicEmail">
 					<Form.Label>Email address</Form.Label>
