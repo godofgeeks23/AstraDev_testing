@@ -1,0 +1,18 @@
+{
+  "title": "IITK Website",
+  "type": "web",
+  "asset_id": "100",
+  "target": "https://www.iitk.ac.in/",
+  "description": "Official IIT Kanpur website",
+}
+
+
+{
+  "name": "SQL Injection",
+  "severity": "High",
+  "url": "www.kiet.edu",
+  "parent_asset": "101",
+  "id": "1000",
+  "description": "SQL injection in the official website which is resulting in RCE",
+  "type": "http",
+}
