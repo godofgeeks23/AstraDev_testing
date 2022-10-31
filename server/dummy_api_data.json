@@ -1,3 +1,4 @@
+asset request - 
 {
   "title": "IITK Website",
   "type": "web",
@@ -7,6 +8,7 @@
 }
 
 
+vulnerability request - 
 {
   "name": "SQL Injection",
   "severity": "High",
