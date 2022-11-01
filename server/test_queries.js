@@ -17,8 +17,7 @@ app.use(express.json())
 
 mongoose.connect(process.env.DB_CONNECT, () => console.log("connected to DB"));
 
-async function get_results()
-{
+async function get_results() {
     res_asset = await asset.find()
 
     console.log(res_asset);
