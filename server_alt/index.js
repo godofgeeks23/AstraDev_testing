@@ -2,13 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 const User = require('./models/user');
 const { auth } = require('./middlewares/auth');
 const db = require('./config/config').get(process.env.NODE_ENV);
-
+const asset = require('./models/asset.model')
+const vulnerability = require('./models/vulnerability.model')
 
 const app = express();
 // app use
+app.use(cors())
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 app.use(cookieParser());
@@ -17,7 +20,7 @@ app.use(cookieParser());
 mongoose.Promise = global.Promise;
 mongoose.connect(db.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true }, function (err) {
     if (err) console.log(err);
-    console.log("database is connected");
+    console.log("Establishing connection with MongoDB - Success");
 });
 
 
@@ -102,8 +105,49 @@ app.get('/', function (req, res) {
     res.status(200).send(`Welcome to login , sign-up api`);
 });
 
+
+app.post('/api/add_asset', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_asset = await asset.create({
+            title: req.body.title,
+            type: req.body.type,
+            asset_id: req.body.asset_id,
+            target: req.body.target,
+            created_date: req.body.created_date,
+            description: req.body.description,
+        })
+        console.log("asset added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+app.post('/api/add_vuln', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_vuln = await vulnerability.create({
+            type: req.body.type,
+            name: req.body.name,
+            created_date: req.body.created_date,
+            severity: req.body.severity,
+            url: req.body.url,
+            status: req.body.status,
+            parent_asset: req.body.parent_asset,
+            id: req.body.id,
+            description: req.body.description,
+        })
+        console.log("vulnerability added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+
 // listening port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`app is live at ${PORT}`);
+    console.log(`Backend server is live at port ${PORT}!`);
 });
