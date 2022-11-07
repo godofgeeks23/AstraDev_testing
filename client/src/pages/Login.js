@@ -13,8 +13,9 @@ function App() {
 
 		event.preventDefault()
 
-		const response = await fetch('http://localhost:1337/api/login', {
+		const response = await fetch('http://localhost:3000/api/login', {
 			method: 'POST',
+			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -24,19 +25,19 @@ function App() {
 		})
 		const data = await response.json()
 
-		if (data.user) {
-			localStorage.setItem('token', data.user)
-			console.log("token value:")
-			const token = localStorage.getItem('token')
-			const user = decodeToken(token);
-			console.log(token)
-			alert("login successful")
+		if (data.isAuth) {
+			localStorage.setItem('token', data.isAuth)
+			// console.log("token value:")
+			// const token = localStorage.getItem('token')
+			// const user = decodeToken(token);
+			// console.log(token)
+			alert("Logged in Successfully!")
 			window.location.href = '/dashboard'
 		} else {
 			alert("please check your crendentials!")
 		}
 
-		console.log(data)
+		// console.log(data)
 	}
 
 	return (
