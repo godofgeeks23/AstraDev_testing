@@ -8,16 +8,13 @@ const { auth } = require('./middlewares/auth');
 const db = require('./config/config').get(process.env.NODE_ENV);
 const asset = require('./models/asset.model')
 const vulnerability = require('./models/vulnerability.model')
+const role = require('./models/roles')
+const customer = require('./models/customer')
 
 const app = express();
+
 // app use
-// app.use(cors())
-// app.use(cors({
-    // origin: 'http://localhost:3001'
-// }));
-
 app.use(cors({ origin: 'http://localhost:3001', credentials: true, exposedHeaders: ['Set-Cookie', 'Date', 'ETag'] }))
-
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 app.use(cookieParser());
@@ -122,13 +119,22 @@ app.get('/api/logout', auth, function (req, res) {
 });
 
 // get logged in user
-app.get('/api/profile', auth, function (req, res) {
+app.get('/api/profile', auth, async function (req, res) {
+
+    const thisrole = await role.findOne({
+        role_id: req.user._id,
+    })
+    // console.log(thisrole.role_name)
+    const thiscustomer = await customer.findOne({
+        cust_id: req.user._id,
+    })
     res.json({
         isAuth: true,
         id: req.user._id,
         email: req.user.email,
-        name: req.user.fname + req.user.lname
-
+        name: req.user.fname + req.user.lname,
+        role_name: thisrole.role_name,
+        cname: thiscustomer.cname
     })
 });
 
@@ -177,6 +183,35 @@ app.post('/api/add_vuln', async (req, res) => {
     }
 })
 
+app.post('/api/add_role', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_role = await role.create({
+            role_name: req.body.role_name,
+            role_id: req.body.role_id,
+            status: req.body.status,
+        })
+        console.log("Role added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+app.post('/api/add_customer', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_customer = await customer.create({
+            cust_id: req.body.cust_id,
+            cname : req.body.cname,
+            status: req.body.status,
+        })
+        console.log("Customer added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
 
 // listening port
 const PORT = process.env.PORT || 3000;
