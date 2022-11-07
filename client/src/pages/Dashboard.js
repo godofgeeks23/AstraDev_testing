@@ -9,12 +9,7 @@ import Cookies from 'js-cookie';
 
 
 async function logout() {
-  const res = await fetch('http://localhost:3000/api/logout', {
-    "headers": {
-      // "cookies":"eyJhbGciOiJIUzI1NiJ9.NjM2NmFiMmU2YTcwZmMwYTEwMTQ1NDQy.YCU80QSzCkkC6KlsIpq4HRL2wSek6C2vGbTAfZs3Im4"
-      "cookies": Cookies.get('auth')
-    }
-  })
+  const res = await fetch('http://localhost:3000/api/logout', { "headers": { "cookies": Cookies.get('auth') } })
   localStorage.removeItem('token');
   Cookies.remove('auth')
   alert("Logged out! Redirecting to Login page...")
@@ -48,7 +43,7 @@ const Dashboard = () => {
     }
 
   }
-  
+
   populateQuote()
 
   return (<div className='dashboardbody end-0 start-0 top-0 position-absolute'>
