@@ -35,13 +35,13 @@ app.use(cookieParser());
 //     res.setHeader("Access-Control-Allow-Methods", "GET, POST");
 //     res.setHeader("Access-Control-Allow-Credentials", "true");
 //     res.setHeader("Access-Control-Expose-Headers", "ETag");
-    //     if ('OPTIONS' == req.method) {
-    //         res.sendStatus(200);
-    //       }
-    //       else {
-    //         next();
-    //       }
-    //     // next();
+//     if ('OPTIONS' == req.method) {
+//         res.sendStatus(200);
+//       }
+//       else {
+//         next();
+//       }
+//     // next();
 // })
 
 
@@ -203,7 +203,7 @@ app.post('/api/add_customer', async (req, res) => {
     try {
         const new_customer = await customer.create({
             cust_id: req.body.cust_id,
-            cname : req.body.cname,
+            cname: req.body.cname,
             status: req.body.status,
         })
         console.log("Customer added successfully!");
