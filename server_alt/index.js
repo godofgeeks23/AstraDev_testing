@@ -141,7 +141,7 @@ app.get('/api/profile', auth, async function (req, res) {
 
 app.get('/', function (req, res) {
     res.status(200).send(`Welcome to login , sign-up api`);
-});
+}); 
 
 
 app.post('/api/add_asset', async (req, res) => {
