@@ -6,7 +6,8 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Cookies from 'js-cookie';
-
+import Emp_header from './components/Emp_header'
+import Mngr_header from './components/Mngr_header'
 
 async function logout() {
   const res = await fetch('http://localhost:3000/api/logout', { "headers": { "cookies": Cookies.get('auth') } })
@@ -34,17 +35,22 @@ const Dashboard = () => {
 
     if (data.isAuth) {
       setQuote(data.name)
+
+      const usrdata = JSON.stringify(data);
+      localStorage.setItem("usrdata", usrdata);
+
     }
     else {
       // alert(data.error)
       alert("You are not logged in... Navigating to /login")
-
       window.location.href = '/login'
     }
 
   }
 
   populateQuote()
+
+  const usr_role = JSON.parse(localStorage.getItem("usrdata")).role_name;
 
   return (<div className='dashboardbody end-0 start-0 top-0 position-absolute'>
 
@@ -63,6 +69,10 @@ const Dashboard = () => {
         {/* </Navbar.Collapse> */}
       </Container>
     </Navbar>
+
+    {usr_role == "Employee" && <Emp_header />}
+    {usr_role == "Manager" && <Mngr_header />}
+    
 
     {/* <button onClickCapture={logout}>logout user</button> */}
   </div>)
