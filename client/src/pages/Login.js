@@ -24,6 +24,7 @@ function App() {
 			})
 		})
 		const data = await response.json()
+		console.log(data)
 
 		if (data.isAuth) {
 			localStorage.setItem('token', data.isAuth)
