@@ -19,6 +19,7 @@ async function logout() {
 
 const Dashboard = () => {
 
+    debugger;
   const navigate = useNavigate()
 
   const [quote, setQuote] = useState('')
@@ -72,7 +73,7 @@ const Dashboard = () => {
 
     {usr_role == "Employee" && <Emp_header />}
     {usr_role == "Manager" && <Mngr_header />}
-    
+
 
     {/* <button onClickCapture={logout}>logout user</button> */}
   </div>)
