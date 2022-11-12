@@ -8,7 +8,7 @@ const customer = new mongoose.Schema({
   cname : { type: String, required: true },
   status: { type: Boolean, default: true },
   is_sec_researcher: { type: Boolean, default: false},
-  is_customer: { type: Boolean, default: true}
+  is_customer: { type: Boolean, default: true},
 
 })
 
