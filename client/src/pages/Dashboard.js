@@ -19,7 +19,7 @@ async function logout() {
 
 const Dashboard = () => {
 
-    debugger;
+  // debugger;
   const navigate = useNavigate()
 
   const [quote, setQuote] = useState('')
