@@ -13,7 +13,7 @@ const App = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/managerpanel" element={<ManagerPanel />} />
+                    <Route path="/managerpanel" element={<ManagerPanel allowedRoles={["Manager"]}/>} />
                 </Routes>
             </BrowserRouter>
         </div>
