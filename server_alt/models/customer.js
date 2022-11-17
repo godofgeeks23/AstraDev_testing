@@ -4,7 +4,6 @@ const validator = require('validator');
 const customer = new mongoose.Schema({
 
   createdDate: { type: Date, default: Date.now },
-  cust_id: { type: String, default : null  },
   cname : { type: String, required: true },
   status: { type: Boolean, default: true },
   is_sec_provider: { type: Boolean, default: false},
