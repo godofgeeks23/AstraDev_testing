@@ -14,7 +14,7 @@ const customer = require('./models/customer')
 const app = express();
 
 // app use
-app.use(cors({ origin: 'http://localhost:3001', credentials: true, exposedHeaders: ['Set-Cookie', 'Date', 'ETag'] }))
+app.use(cors({ origin: 'http://3.6.39.205:3001', credentials: true, exposedHeaders: ['Set-Cookie', 'Date', 'ETag'] }))
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 app.use(cookieParser());
@@ -30,7 +30,7 @@ app.use(cookieParser());
 // })
 
 // app.use((req, res, next) => {
-//     res.setHeader("Access-Control-Allow-Origin", 'http://localhost:3001')
+//     res.setHeader("Access-Control-Allow-Origin", 'http://3.6.39.205:3001')
 //     res.setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Type, Accept');
 //     res.setHeader("Access-Control-Allow-Methods", "GET, POST");
 //     res.setHeader("Access-Control-Allow-Credentials", "true");

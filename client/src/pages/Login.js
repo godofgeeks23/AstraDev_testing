@@ -13,7 +13,7 @@ function App() {
 
 		event.preventDefault()
 
-		const response = await fetch('http://localhost:3000/api/login', {
+		const response = await fetch('http://3.6.39.205:3000/api/login', {
 			method: 'POST',
 			credentials: 'include',
 			headers: {

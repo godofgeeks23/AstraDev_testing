@@ -10,7 +10,7 @@ import Emp_header from './components/Emp_header'
 import Mngr_header from './components/Mngr_header'
 
 async function logout() {
-  const res = await fetch('http://localhost:3000/api/logout', { "headers": { "cookies": Cookies.get('auth') } })
+  const res = await fetch('http://3.6.39.205:3000/api/logout', { "headers": { "cookies": Cookies.get('auth') } })
   localStorage.removeItem('token');
   Cookies.remove('auth')
   alert("Logged out! Redirecting to Login page...")
@@ -26,7 +26,7 @@ const Dashboard = () => {
 
   async function populateQuote() {
 
-    const res = await fetch('http://localhost:3000/api/profile', {
+    const res = await fetch('http://3.6.39.205:3000/api/profile', {
       "headers": {
         // "cookies":"eyJhbGciOiJIUzI1NiJ9.NjM2NmFiMmU2YTcwZmMwYTEwMTQ1NDQy.YCU80QSzCkkC6KlsIpq4HRL2wSek6C2vGbTAfZs3Im4"
         "cookies": Cookies.get('auth')
