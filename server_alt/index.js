@@ -122,11 +122,11 @@ app.get('/api/logout', auth, function (req, res) {
 app.get('/api/profile', auth, async function (req, res) {
 
     const thisrole = await role.findOne({
-        role_id: req.user._id,
+        role_id: req.user.role_id,
     })
     // console.log(thisrole.role_name)
     const thiscustomer = await customer.findOne({
-        cust_id: req.user._id,
+        _id: req.user.cust_id,
     })
     res.json({
         isAuth: true,
