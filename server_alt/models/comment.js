@@ -8,6 +8,9 @@ const comment = new mongoose.Schema({
   media: { type: String, default: null },
   upvotes: { type: Number, default: 0 },
   downvotes: { type: Number, default: 0 },
+  // vuln id
+  // acvitiy id
+  
 
 })
 
