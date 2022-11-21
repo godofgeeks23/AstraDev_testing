@@ -6,8 +6,6 @@ const comment = new mongoose.Schema({
   user_id: { type: String, default: null },
   content: { type: String, required: true },
   media: { type: String, default: null },
-  upvotes: { type: Number, default: 0 },
-  downvotes: { type: Number, default: 0 },
   vuln_id: { type: String, required: true},
   activity_id: { type: String, required: true },
   fname: { type: String, required: true },
