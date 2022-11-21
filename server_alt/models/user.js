@@ -30,8 +30,8 @@ const userSchema = new mongoose.Schema({
     token: { type: String, default: null },
     role_id: { type: String, default: null },
 
-    // invited by - manager id
-    
+    invited_by: { type: String, default: null },
+
 
 })
 
