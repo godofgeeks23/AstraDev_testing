@@ -6,7 +6,6 @@ const activity = new mongoose.Schema({
     user_id: { type: String, default: null },
     content: { type: String, required: true },
     vuln_id: { type: String, required: true },
-    activity_id: { type: String, required: true },
     fname: { type: String, required: true },
     lname: { type: String, required: true },
     username: { type: String, required: true },
@@ -17,6 +16,6 @@ const activity = new mongoose.Schema({
 
 })
 
-const model = mongoose.model("schema_activity", comment)
+const model = mongoose.model("schema_activity", activity)
 
 module.exports = model
