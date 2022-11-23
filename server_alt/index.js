@@ -10,6 +10,8 @@ const asset = require('./models/asset.model')
 const vulnerability = require('./models/vulnerability.model')
 const role = require('./models/roles')
 const customer = require('./models/customer')
+const comment = require('./models/comment')
+const activity = require("./models/activity.model")
 
 const app = express();
 
@@ -141,7 +143,7 @@ app.get('/api/profile', auth, async function (req, res) {
 
 app.get('/', function (req, res) {
     res.status(200).send(`Welcome to login , sign-up api`);
-}); 
+});
 
 
 app.post('/api/add_asset', async (req, res) => {
@@ -207,6 +209,41 @@ app.post('/api/add_customer', async (req, res) => {
             status: req.body.status,
         })
         console.log("Customer added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+app.post('/api/add_comment', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_activity = await activity.create({
+            user_id: req.body.user_id,
+            content: "Added comment " + req.body.content,
+            vuln_id: req.body.vuln_id,
+            fname: req.body.fname,
+            lname: req.body.lname,
+            username: req.body.username,
+            cust_id: req.body.cust_id,
+            role_id: req.body.role_id,
+            cname: req.body.cname,
+        })
+        console.log("Activity created successfully!");
+        console.log("activity id: ", new_activity._id);
+        const new_comment = await comment.create({
+            user_id: req.body.user_id,
+            content: req.body.content,
+            vuln_id: req.body.vuln_id,
+            activity_id: new_activity._id,
+            fname: req.body.fname,
+            lname: req.body.lname,
+            username: req.body.username,
+            cust_id: req.body.cust_id,
+            role_id: req.body.role_id,
+            cname: req.body.cname,
+        })
+        console.log("Comment added successfully!");
         res.json({ status: "ok" })
     } catch (error) {
         res.json({ status: "error", error })
