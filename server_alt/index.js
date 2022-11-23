@@ -158,6 +158,7 @@ app.post('/api/add_asset', async (req, res) => {
             description: req.body.description,
         })
         console.log("asset added successfully!");
+        
         res.json({ status: "ok" })
     } catch (error) {
         res.json({ status: "error", error })
@@ -220,7 +221,7 @@ app.post('/api/add_comment', async (req, res) => {
     try {
         const new_activity = await activity.create({
             user_id: req.body.user_id,
-            content: "Added comment " + req.body.content,
+            content: "Added comment: '" + req.body.content + "'",
             vuln_id: req.body.vuln_id,
             fname: req.body.fname,
             lname: req.body.lname,
