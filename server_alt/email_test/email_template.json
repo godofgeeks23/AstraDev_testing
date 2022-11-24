@@ -1,0 +1,7 @@
+{
+    "Template": {
+        "TemplateName": "EmailTemplate",
+        "SubjectPart": "Hey {{name}}! Welcome to our site!",
+        "HtmlPart": "Please find the details - {{name}}, {{email}} {{phone}}."
+    }
+}
