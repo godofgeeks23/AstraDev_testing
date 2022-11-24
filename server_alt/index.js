@@ -216,7 +216,7 @@ app.post('/api/add_customer', async (req, res) => {
     }
 })
 
-app.post('/api/add_comment', async (req, res) => {
+app.post('/api/add_comment', auth, async (req, res) => {
     console.log(req.body)
     try {
         const new_activity = await activity.create({
@@ -250,6 +250,14 @@ app.post('/api/add_comment', async (req, res) => {
         res.json({ status: "error", error })
     }
 })
+
+app.get('/api/test_nesting', auth, async function (req, res) {
+
+    console.log("can access test_nesting api if 'auth' is set to " + auth)
+    res.json({
+        status: "ok"
+    })
+});
 
 // listening port
 const PORT = process.env.PORT || 3000;
