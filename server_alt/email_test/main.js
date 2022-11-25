@@ -13,7 +13,9 @@ const mainFunction = async () => {
 mainFunction().then(() => {
 
     console.log('template created successfully.');
+
 }, (ex) => {
+
     console.log('Error in template creation.');
     console.dir(ex.message);
 
