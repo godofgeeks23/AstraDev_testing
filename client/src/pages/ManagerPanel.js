@@ -36,7 +36,7 @@ const ManagerPanel = (props) => {
                 <h1 className="text-center p-3">You are seeing this page because you are a Allowed</h1>
             </div>
         );
-    
+
 }
 
 export default ManagerPanel
