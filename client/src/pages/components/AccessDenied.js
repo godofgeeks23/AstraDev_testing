@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 
 function access_denied() {
   return (
-      <h1>You are not authorized for accessing this page!</h1>
+    <h1>You are not authorized for accessing this page!</h1>
   );
 }
 
