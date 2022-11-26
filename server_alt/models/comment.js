@@ -6,7 +6,7 @@ const comment = new mongoose.Schema({
   user_id: { type: String, default: null },
   content: { type: String, required: true },
   media: { type: String, default: null },
-  vuln_id: { type: String, required: true},
+  vuln_id: { type: String, required: true },
   activity_id: { type: String, required: true },
   fname: { type: String, required: true },
   lname: { type: String, required: true },
