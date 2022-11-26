@@ -158,7 +158,7 @@ app.post('/api/add_asset', async (req, res) => {
             description: req.body.description,
         })
         console.log("asset added successfully!");
-        
+
         res.json({ status: "ok" })
     } catch (error) {
         res.json({ status: "error", error })
