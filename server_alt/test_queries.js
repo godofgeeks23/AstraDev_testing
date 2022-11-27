@@ -30,8 +30,8 @@ async function get_results() {
   // await newrole.save()
 
   const newrole = await role.create({
-    role_name: "Employee",
-    role_id: "jh32bjh3b2j265b7",
+    role_name: "",
+    role_id: "",
   });
 }
 
