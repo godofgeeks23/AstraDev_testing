@@ -17,9 +17,10 @@ dotenv.config()
 // app.use(cors())
 app.use(express.json())
 
-mongoose.connect(process.env.DB_CONNECT, () => console.log("connected to DB"));
+mongoose.connect(process.env.DB_CONNECT, () => console.log("Successfully Connected to DB!"));
 
 async function get_results() {
+
   // res_asset = await asset.find()
   // console.log(res_asset);
 
@@ -33,6 +34,7 @@ async function get_results() {
     role_name: "",
     role_id: "",
   });
+
 }
 
 get_results();
