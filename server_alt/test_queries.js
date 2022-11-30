@@ -1,16 +1,8 @@
 const express = require('express')
 const app = express()
-const cors = require('cors')
 const mongoose = require('mongoose')
-const User = require('./models/user')
-const jwt = require('jsonwebtoken')
 const dotenv = require('dotenv')
-const bcrypt = require('bcryptjs')
-const validator = require('validator');
-const asset = require('./models/asset.model')
-const vulnerability = require('./models/vulnerability.model')
 const role = require('./models/roles')
-const customer = require('./models/customer')
 
 dotenv.config()
 
