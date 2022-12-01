@@ -1,8 +1,9 @@
 const express = require('express')
-const app = express()
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const role = require('./models/roles')
+
+const app = express()
 
 dotenv.config()
 
