@@ -10,6 +10,7 @@ const App = () => {
         <div className='h-100 d-flex align-items-center justify-content-center'>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/" element={<Login />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<Dashboard />} />
