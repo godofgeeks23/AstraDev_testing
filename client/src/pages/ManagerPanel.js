@@ -9,7 +9,7 @@ const ManagerPanel = (props) => {
 
     async function chkAccess() {
 
-        const res = await fetch('http://3.6.39.205:3000/api/profile', {
+        const res = await fetch('http://localhost:3000/api/profile', {
             "headers": { "cookies": Cookies.get('auth') }
         })
         const data = await res.json();
