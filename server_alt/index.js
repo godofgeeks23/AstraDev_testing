@@ -12,6 +12,8 @@ const role = require('./models/roles')
 const customer = require('./models/customer')
 const comment = require('./models/comment')
 const activity = require("./models/activity.model")
+const pending_user = require("./models/pending_user")
+const { ObjectId } = require('mongodb');
 
 const app = express();
 
@@ -258,6 +260,42 @@ app.get('/api/test_nesting', auth, async function (req, res) {
         status: "ok"
     })
 });
+
+
+app.post('/api/create_pending_user', async (req, res) => {
+    console.log(req.body)
+    try {
+        const new_pending_user = await pending_user.create({
+            email: req.body.email,
+            role_id: req.body.role_id,
+            invited_by: req.body.invited_by,
+            validity: req.body.validity,
+        })
+        console.log("Pending user added! (id: ", new_pending_user.id + ")");
+        res.json({ pending_user_id: new_pending_user._id, status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+app.post('/api/validate_pending_user', async (req, res) => {
+    // console.log(req.body)
+    const thispendinguser = await pending_user.findOne({
+        _id: ObjectId(req.body.pending_user_id),
+    })
+    if (thispendinguser) {
+        // implement token time validity test here
+        console.log("Validation successful!");
+        await pending_user.remove(({ _id: ObjectId(req.body.pending_user_id) }), function (err) {
+            if (err) { console.log(err) }
+            else { console.log("User Activated. Removed from *pending users* state..."); }
+        });
+        res.json({ status: "ok" })
+    }
+    else {
+        res.json({ status: "error" })
+    }
+})
 
 // listening port
 const PORT = process.env.PORT || 3000;
