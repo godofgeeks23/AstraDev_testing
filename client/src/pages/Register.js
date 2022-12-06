@@ -8,32 +8,44 @@ function App() {
 	const [mname, setmname] = useState('')
 	const [lname, setlname] = useState('')
 	const [username, setusername] = useState('')
-	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
-	const [isAdmin, setisAdmin] = useState(false)
-
 	const navigate = useNavigate()
 
-	async function registerUser(event) {
+	async function registerUser(event) {		
+		
 		event.preventDefault()
-
-		const response = await fetch('http://localhost:1337/api/register', {
+		const validated_email = localStorage.getItem('validated_email')
+		const validated_role_id = localStorage.getItem('validated_role_id')
+		const validated_invitor = localStorage.getItem('validated_invitor')
+        const req_body = { 
+            fname: fname,
+            mname: mname,
+            lname: lname,
+            username: username,
+            email: validated_email,
+            password: password,
+            password2: password,
+            cust_id: "63762968b7e0efa6b95168c4",
+            role_id: validated_role_id,
+            invited_by: validated_invitor,
+        }
+		const response = await fetch('http://localhost:3000/api/register', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				fname, mname, lname, username, email, password, isAdmin,
-			})
+			}, 
+			body: JSON.stringify(req_body)
 		})
 		const data = await response.json()
 
 		console.log(data)
 
 		if (data.status === 'ok') {
-			navigate('/login')
+			localStorage.removeItem('validated_email');
+			localStorage.removeItem('validated_role_id');
+			localStorage.removeItem('validated_invitor');
+			navigate('/login') 
 		}
-
 	}
 
 	return (
@@ -69,24 +81,12 @@ function App() {
 				/>
 				<br />
 				<input
-					value={email}
-					onChange={(e) => setEmail(e.target.value)}
-					type="email"
-					placeholder="Email"
-				/>
-				<br />
-				<input
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
 					type="password"
 					placeholder="Password"
 				/>
 				<br />
-
-				<input id="admincheckbox" type="checkbox" onChange={(e) => setisAdmin(e.target.checked)} />
-				<label for="admincheckbox"> {isAdmin ? 'Admin' : 'Not Admin'}</label>
-				<br />
-
 				<input type="submit" value="Register" />
 			</form>
 		</div>
