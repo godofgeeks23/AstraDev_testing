@@ -290,7 +290,7 @@ app.post('/api/validate_pending_user', async (req, res) => {
             if (err) { console.log(err) }
             else { console.log("User Activated. Removed from *pending users* state..."); }
         });
-        res.json({ status: "ok" })
+        res.json({ user: thispendinguser, status: "ok" })
     }
     else {
         res.json({ status: "error" })
