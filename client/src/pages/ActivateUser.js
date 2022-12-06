@@ -5,15 +5,17 @@ import Access_denied from './components/AccessDenied';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useLocation } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
 
 const ActivateUserPage = () => {
 
     const search = useLocation().search;
     const token = new URLSearchParams(search).get("token");
-    // alert(token);
+
+    const navigate = useNavigate()
 
     async function validateUser() {
-
+        
         const req_body = { pending_user_id: token }
         const response = await fetch('http://localhost:3000/api/validate_pending_user', {
             method: 'POST',
@@ -24,16 +26,20 @@ const ActivateUserPage = () => {
             body: JSON.stringify(req_body)
         })
         const data = await response.json()
-        console.log(data)
-
         if (data.status == "ok") {
+            localStorage.setItem('validated_email', data.user.email)
+            localStorage.setItem('validated_role_id', data.user.role_id)
+            localStorage.setItem('validated_invitor', data.user.invited_by)
             alert("User Activation Successful! Move on to fill your details...")
+            navigate('/register')
         } else { alert("Activation Failed!") }
 
     }
+
     validateUser();
+
     return (
-        <div className='login_container p-5 m-5 bg-dark'>
+        <div className='register_container'>
 
         </div>
     );
