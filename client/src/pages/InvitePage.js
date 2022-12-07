@@ -68,12 +68,10 @@ const InvitePage = (props) => {
 		// console.log(data)
 	}
 
-
-
     if (hasAccess)
         return (
             <div className='login_container p-5 m-5 bg-dark'>
-			<h1 className='text-center p-3'>Login</h1>
+			<h1 className='text-center p-3'>Invite User</h1>
 			<Form onSubmit={inviteUser}>
 				<Form.Group className="mb-3" controlId="formBasicEmail">
 					<Form.Label>Email address</Form.Label>
