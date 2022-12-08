@@ -99,7 +99,7 @@ app.post('/api/login', function (req, res) {
                 if (!user) return res.json({ isAuth: false, message: ' Auth failed ,email not found' });
 
                 user.comparepassword(req.body.password, (err, isMatch) => {
-                    debugger;
+                    // debugger;
                     if (!isMatch) return res.json({ isAuth: false, message: "password doesn't match" });
 
                     user.generateToken((err, user) => {
