@@ -14,6 +14,8 @@ const comment = require('./models/comment')
 const activity = require("./models/activity.model")
 const pending_user = require("./models/pending_user")
 const { ObjectId } = require('mongodb');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 
@@ -294,6 +296,63 @@ app.post('/api/validate_pending_user', async (req, res) => {
     }
     else {
         res.json({ status: "error" })
+    }
+})
+
+app.post('/api/reset_password_token', async (req, res) => {
+    // console.log(req.body)
+    try {
+        const forgot_user = await User.findOne({
+            email: req.body.email,
+        })
+        const reset_token_plain = forgot_user._id + forgot_user.email;
+        const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
+
+        console.log("Reset token generated (" + reset_token_hashed + ") !");
+        res.json({ pswd_reset_token: reset_token_hashed, status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+// app.post('/api/validate_resetpswd_token', async (req, res) => {
+//     try {
+//         const forgot_user = await User.findOne({
+//             email: req.body.email,
+//         })
+//         const reset_token_plain = forgot_user._id + forgot_user.email;
+//         const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
+//         if (reset_token_hashed === req.body.resetpswd_token) {
+//             console.log("User verified!");
+//             res.json({ status: "ok" })
+//         }
+//         else
+//             res.json({ status: "error" })
+//     } catch (error) {
+//         res.json({ status: "error", error })
+//     }
+// })
+
+app.post('/api/reset_password', async (req, res) => {
+    // console.log(req.body)
+    try {
+        const forgot_user = await User.findOne({
+            email: req.body.email,
+        })
+        const reset_token_plain = forgot_user._id + forgot_user.email;
+        const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
+        if ((reset_token_hashed === req.body.resetpswd_token) && (req.body.password === req.body.password2)) {
+            const new_password_hash = await bcrypt.hash(req.body.password, 10);
+            forgot_user.password = new_password_hash;
+            forgot_user.password2 = new_password_hash;
+            await forgot_user.save()
+            console.log("Password reset successfull");
+            res.json({ status: "ok" })
+        }
+        else
+            res.json({ status: "error" })
+    } catch (error) {
+        res.json({ status: "error", error })
     }
 })
 
