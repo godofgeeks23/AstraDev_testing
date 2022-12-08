@@ -316,24 +316,6 @@ app.post('/api/reset_password_token', async (req, res) => {
     }
 })
 
-// app.post('/api/validate_resetpswd_token', async (req, res) => {
-//     try {
-//         const forgot_user = await User.findOne({
-//             email: req.body.email,
-//         })
-//         const reset_token_plain = forgot_user._id + forgot_user.email;
-//         const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
-//         if (reset_token_hashed === req.body.resetpswd_token) {
-//             console.log("User verified!");
-//             res.json({ status: "ok" })
-//         }
-//         else
-//             res.json({ status: "error" })
-//     } catch (error) {
-//         res.json({ status: "error", error })
-//     }
-// })
-
 app.post('/api/reset_password', async (req, res) => {
     // console.log(req.body)
     try {
