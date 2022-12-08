@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard'
 import ManagerPanel from './pages/ManagerPanel'
 import InvitePage from './pages/InvitePage'
 import ActivateUserPage from './pages/ActivateUser'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 const App = () => {
     return (
@@ -19,6 +21,8 @@ const App = () => {
                     <Route path="/managerpanel" element={<ManagerPanel allowedRoles={["Manager"]} />} />
                     <Route path="/invitepage" element={<InvitePage allowedRoles={["Manager"]} />} />
                     <Route path="/activateuser" element={<ActivateUserPage />} />
+                    <Route path="/forgotpassword" element={<ForgotPassword />} />
+                    <Route path="/resetpassword" element={<ResetPassword />} />
                 </Routes>
             </BrowserRouter>
         </div>
