@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
 
     invited_by: { type: String, default: null },
 
+        
 
 })
 
