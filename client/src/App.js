@@ -11,7 +11,7 @@ import ResetPassword from './pages/ResetPassword'
 
 const App = () => {
     return (
-        <div className='h-100 d-flex align-items-center justify-content-center'>
+        <div>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<Login />} />
