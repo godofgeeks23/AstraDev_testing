@@ -12,6 +12,7 @@ import Mngr_header from './components/Mngr_header'
 async function logout() {
   const res = await fetch('http://localhost:3000/api/logout', { "headers": { "cookies": Cookies.get('auth') } })
   localStorage.removeItem('token');
+  localStorage.removeItem("usrdata")
   Cookies.remove('auth')
   alert("Logged out! Redirecting to Login page...")
   window.location.href = '/login'
@@ -38,15 +39,37 @@ const Dashboard = () => {
       setQuote(data.name)
 
       const usrdata = JSON.stringify(data);
-      localStorage.setItem("usrdata", usrdata);
+      await localStorage.setItem("usrdata", usrdata);
 
     }
     else {
       // alert(data.error)
       alert("You are not logged in... Navigating to /login")
-      window.location.href = '/login'
+      await logout()
+      navigate("/login")
     }
 
+
+
+  //   fetch('http://localhost:3000/api/profile', {      "headers": {             "cookies": Cookies.get('auth')      }    }).then(
+  //     function (res) {
+  //       console.log(res)
+  //     const data = res.json();
+  //     if (data.isAuth) {
+  //       setQuote(data.name)
+  
+  //       const usrdata = JSON.stringify(data);
+  //       localStorage.setItem("usrdata", usrdata);
+  
+  //     }
+  //     else {
+  //       // alert(data.error)
+  //       alert("You are not logged in... Navigating to /login")
+  //       window.location.href = '/login'
+  //     }
+
+
+  // })
   }
 
   populateQuote()
