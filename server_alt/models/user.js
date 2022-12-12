@@ -71,6 +71,7 @@ userSchema.methods.comparepassword = function (password, cb) {
 // generate token
 userSchema.methods.generateToken = function (cb) {
     var user = this;
+    console.log("generateToken() called... confq.SECRET - ", confiq.SECRET)
     var token = jwt.sign(user._id.toHexString(), confiq.SECRET);
 
     user.token = token;
