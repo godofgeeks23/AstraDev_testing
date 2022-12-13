@@ -62,7 +62,7 @@ userSchema.pre('save', function (next) {
 //to login
 userSchema.methods.comparepassword = function (password, cb) {
     bcrypt.compare(password, this.password, function (err, isMatch) {
-        console.log(password, this.password)
+        // console.log(password, this.password)
         if (err) return cb(next);
         cb(null, isMatch);
     });
@@ -100,7 +100,7 @@ userSchema.statics.findByToken = function (token, cb) {
                 cb(null, user);
             })
         }
-        catch(err) {
+        catch (err) {
             // console.log("error:", err)
             cb(true, null);
         }
