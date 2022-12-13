@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 
     invited_by: { type: String, default: null },
 
-        
+
 
 })
 
@@ -71,14 +71,22 @@ userSchema.methods.comparepassword = function (password, cb) {
 // generate token
 userSchema.methods.generateToken = function (cb) {
     var user = this;
-    console.log("generateToken() called... confq.SECRET - ", confiq.SECRET)
-    var token = jwt.sign(user._id.toHexString(), confiq.SECRET);
+    // var token = jwt.sign(user._id.toHexString(), confiq.SECRET);
 
-    user.token = token;
-    user.save(function (err, user) {
-        if (err) return cb(err);
-        cb(null, user);
-    })
+    const token = jwt.sign({ "data": user._id }, confiq.SECRET,
+        function (err, token) {
+            if (err) {
+                console.log("Error in token generation - ", err);
+            } else {
+                console.log("Token generated. ", token);
+                user.token = token;
+                user.save(function (err, user) {
+                    if (err) return cb(err);
+                    cb(null, user);
+                })
+            }
+        });
+
 }
 
 // find by token
@@ -86,10 +94,16 @@ userSchema.statics.findByToken = function (token, cb) {
     var user = this;
 
     jwt.verify(token, confiq.SECRET, function (err, decode) {
-        user.findOne({ "_id": decode, "token": token }, function (err, user) {
-            if (err) return cb(err);
-            cb(null, user);
-        })
+        try {
+            user.findOne({ "_id": decode.data, "token": token }, function (err, user) {
+                if (err) return cb(err);
+                cb(null, user);
+            })
+        }
+        catch(err) {
+            // console.log("error:", err)
+            cb(true, null);
+        }
     })
 };
 
