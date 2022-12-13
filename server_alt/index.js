@@ -318,7 +318,6 @@ app.post('/api/reset_password_token', async (req, res) => {
 })
 
 app.post('/api/reset_password', async (req, res) => {
-    // console.log(req.body)
     try {
         const forgot_user = await User.findOne({
             email: req.body.email,
@@ -326,11 +325,20 @@ app.post('/api/reset_password', async (req, res) => {
         const reset_token_plain = forgot_user._id + forgot_user.email;
         const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
         if ((reset_token_hashed === req.body.resetpswd_token) && (req.body.password === req.body.password2)) {
-            const new_password_hash = await bcrypt.hash(req.body.password, 10);
-            forgot_user.password = new_password_hash;
-            forgot_user.password2 = new_password_hash;
-            await forgot_user.save()
-            console.log("Password reset successfull");
+            // console.log("token hash check completed")
+            bcrypt.genSalt(10, function (err, salt) {
+                if (err) return next(err);
+                bcrypt.hash(req.body.password, 10, function (err, hash) {
+                    if (err) return next(err);
+                    // next();
+                    forgot_user.password = hash;
+                    forgot_user.password2 = hash;
+                    User.findByIdAndUpdate(forgot_user._id, {
+                        password: hash,
+                        password2: hash
+                    }).then(() => { console.log("Modified records saved. Password reset successfull"); })
+                })
+            })
             res.json({ status: "ok" })
         }
         else
