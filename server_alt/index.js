@@ -88,7 +88,7 @@ app.post('/api/register', function (req, res) {
 app.post('/api/login', function (req, res) {
     let token = req.cookies.auth;
     User.findByToken(token, (err, user) => {
-        if (err) return res(err);
+        if (err) { console.log("err in fiding the token..."); }
         if (user) return res.status(400).json({
             error: true,
             message: "You are already logged in"
@@ -104,6 +104,7 @@ app.post('/api/login', function (req, res) {
 
                     user.generateToken((err, user) => {
                         if (err) return res.status(400).send(err);
+                        console.log("saving token auth in cookies...")
                         res.cookie('auth', user.token).json({
                             isAuth: true,
                             id: user._id
