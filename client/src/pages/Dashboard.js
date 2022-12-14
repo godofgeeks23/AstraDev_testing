@@ -45,8 +45,8 @@ const Dashboard = () => {
     else {
       // alert(data.error)
       alert("You are not logged in... Navigating to /login")
-      await logout()
-      navigate("/login")
+      // await logout()
+      window.location.href = '/login'
     }
 
 
