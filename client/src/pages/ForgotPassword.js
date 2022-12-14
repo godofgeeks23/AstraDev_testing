@@ -9,6 +9,40 @@ const ForgotPassword = () => {
 
     const [email, setEmail] = useState('')
 
+    async function sendResetPassMail(dest, token) {
+        const req_body = {
+            source: "support@cyethack.com",
+            destinations: [dest],
+            subject: "Password Reset Request",
+            body: "Reset Password",
+            html: "<h1>Visit http://localhost:3001/resetpassword?email=" + dest + "&token=" + token + " to reset your password.<h1>",
+        }
+        fetch('https://qet85fubbi.execute-api.ap-south-1.amazonaws.com/dev/sendemail', {
+            method: 'POST',
+            // credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req_body)
+        }).then((res) => {
+            res.json().then((data) => {
+                console.log("Response returned by Mailing API: ", data)
+                if (data.message_id) {
+                    alert("Check Your Mail!")
+                } else {
+                    alert("Unable to send mail!")
+                }
+            })
+        })
+        // const data = await response.json()
+        // console.log("got response: ", data)
+        // if (data.message_id) {
+        //     alert("Check Your Mail!")
+        // } else {
+        //     alert("Unable to send mail!")
+        // }
+    }
+
     async function getresetpasstoken(event) {
         event.preventDefault()
 
@@ -24,11 +58,13 @@ const ForgotPassword = () => {
         const data = await response.json()
         console.log(data)
         if (data.status == "ok") {
-            alert("Visit http://localhost:3001/resetpassword?email=" + email + "&token=" + data.pswd_reset_token + " to reset your password.")
+            // alert("Visit http://localhost:3001/resetpassword?email=" + email + "&token=" + data.pswd_reset_token + " to reset your password.")
+            sendResetPassMail(email, data.pswd_reset_token)
         } else {
             alert("Reset password token generation failed!")
         }
     }
+
 
     return (
         <div className='login_container p-5 m-5 bg-dark'>
