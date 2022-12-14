@@ -78,7 +78,7 @@ userSchema.methods.generateToken = function (cb) {
             if (err) {
                 console.log("Error in token generation - ", err);
             } else {
-                console.log("Token generated. ", token);
+                console.log("Token generated.");
                 user.token = token;
                 user.save(function (err, user) {
                     if (err) return cb(err);
