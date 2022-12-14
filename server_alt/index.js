@@ -310,7 +310,7 @@ app.post('/api/reset_password_token', async (req, res) => {
         const reset_token_plain = forgot_user._id + forgot_user.email;
         const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
 
-        console.log("Reset token generated (" + reset_token_hashed + ") !");
+        // console.log("Reset token generated (" + reset_token_hashed + ") !");
         res.json({ pswd_reset_token: reset_token_hashed, status: "ok" })
     } catch (error) {
         res.json({ status: "error", error })
@@ -347,6 +347,17 @@ app.post('/api/reset_password', async (req, res) => {
         res.json({ status: "error", error })
     }
 })
+
+// get assets
+app.get('/api/get_manager_assets', auth, async function (req, res) {
+
+    const assets = await asset.find({
+        assignor_managers: req.user.usr_id,
+    })
+    res.json({
+        assets: assets
+    })
+});
 
 // listening port
 const PORT = process.env.PORT || 3000;
