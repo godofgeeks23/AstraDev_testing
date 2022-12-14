@@ -355,10 +355,7 @@ app.post('/api/reset_password', async (req, res) => {
 
 // get assets
 app.get('/api/get_manager_assets', auth, async function (req, res) {
-
-    const assets = await asset.find({
-        assignor_managers: req.user.usr_id,
-    })
+    const assets = await asset.find({ assignor_managers: req.user._id })
     res.json({
         assets: assets
     })
