@@ -16,6 +16,7 @@ const pending_user = require("./models/pending_user")
 const { ObjectId } = require('mongodb');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
+const user = require('./models/user');
 
 const app = express();
 
@@ -152,22 +153,26 @@ app.get('/', function (req, res) {
 });
 
 
-app.post('/api/add_asset', async (req, res) => {
-    console.log(req.body)
-    try {
-        const new_asset = await asset.create({
-            title: req.body.title,
-            type: req.body.type,
-            asset_id: req.body.asset_id,
-            target: req.body.target,
-            created_date: req.body.created_date,
-            description: req.body.description,
-        })
-        console.log("asset added successfully!");
+app.post('/api/add_asset', auth, async (req, res) => {
+    // console.log("Added by - ", req.user.role_id)
+    if (req.user.role_id == "100") {
+        try {
+            const new_asset = await asset.create({
+                title: req.body.title,
+                type: req.body.type,
+                target: req.body.target,
+                description: req.body.description,
+                assignor_managers: [req.user._id],
+            })
+            console.log("asset added successfully!");
 
-        res.json({ status: "ok" })
-    } catch (error) {
-        res.json({ status: "error", error })
+            res.json({ status: "ok", asset_id: new_asset._id })
+        } catch (error) {
+            res.json({ status: "error", error })
+        }
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to add an asset in the DB" })
     }
 })
 
