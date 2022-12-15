@@ -1,14 +1,9 @@
 import { useState } from 'react'
 // import '../App.css'
-import { isExpired, decodeToken } from "react-jwt";
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+
 import './style.css'
-import anim from './Union.png'
-import logo from './logo.png'
 
 function App() {
-
 
 	const [qrurl, setqrurl] = useState("");
 
@@ -24,6 +19,7 @@ function App() {
 		})
 		const data = await response.json()
 		setqrurl(data.qr)
+		
 	}
 
 	return (
@@ -36,7 +32,7 @@ function App() {
 				<img id="qrcodeimg" src={qrurl} alt="QR Code"></img>
 				{/* add a button to navigate to /verify2fa */}
 
-				{qrurl && <button type='submit' className='button-84'>Verify 2FA Activation</button>}
+				{qrurl && <button type='submit' onClick={() => window.location.href='/verifytwofa'} className='button-84'>Verify 2FA Activation</button>}
 			</div>
 
 		</>
