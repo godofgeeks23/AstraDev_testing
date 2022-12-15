@@ -44,25 +44,6 @@ function App() {
 		// console.log(data)
 	}
 
-	// return (
-	// 	<div className='login_container p-5 m-5 bg-dark'>
-	// 		<h1 className='text-center p-3'>Login</h1>
-	// 		<Form onSubmit={loginUser}>
-	// 			<Form.Group className="mb-3" controlId="formBasicEmail">
-	// 				<Form.Label>Email address</Form.Label>
-	// 				<Form.Control type="text" placeholder="Enter email" value={email} onChange={(e) => setEmail(e.target.value)} />
-	// 			</Form.Group>
-	// 			<Form.Group className="mb-3" controlId="formBasicPassword">
-	// 				<Form.Label>Password</Form.Label>
-	// 				<Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-	// 			</Form.Group>
-	// 			<Button variant="primary" type="submit">
-	// 				Submit
-	// 			</Button>
-	// 		</Form>
-
-	// 	</div>
-	// )
 	return (
 		<>
 
@@ -111,57 +92,3 @@ function App() {
 }
 
 export default App
-
-
-// import React from 'react'
-// import './style.css'
-// import anim from './Union.png'
-// import logo from './logo.png'
-// function Login() {
-// 	return (
-// 		<>
-
-// 			<div className='left'>
-// 				<div className='left-content'>
-// 					<p className='reset-heading'><b>Company <br />
-// 						Manager Portal</b></p>
-// 					<div className='reset-content'><p><ul>
-// 						<li>
-// 							points
-// 						</li>
-// 						<li>
-// 							points
-// 						</li>
-// 						<li>
-// 							points
-// 						</li>
-// 					</ul></p></div>
-// 				</div>
-// 				<div><img src={anim} className="anim" alt='anim' /></div>
-// 			</div>
-
-// 			<div className='right'>
-// 				<div className='right-content'>
-// 					<div><h2> <img src={logo} className="logo" alt='anim' />&nbsp; Cyethack Solutions</h2></div>
-// 					<div className='right-content-text'>
-
-// 						<form onSubmit={loginUser}>
-// 							<h1 style={{ textAlign: "center" }}><b>Log In</b></h1>
-// 							<label for="email">Email<br />
-// 								<input type="email" className='text-area' value={email} onChange={(e) => setEmail(e.target.value)} />
-// 							</label><br />
-// 							<label for="pass">Password <br />
-// 								<input type="password" className='text-area' placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-// 							</label><br />
-// 							<a href='/forgotPassword' style={{ textDecoration: "underline", color: "#000" }}>Forgot Password?</a> <br />
-// 							<button type='submit' className='button-84'>Done</button>
-// 						</form>
-
-// 					</div>
-
-// 				</div>
-// 			</div>
-// 		</>
-// 	)
-// }
-// export default Login
