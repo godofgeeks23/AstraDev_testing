@@ -26,7 +26,7 @@ function App() {
             })
         })
         const data = await response.json()
-        console.log(data)
+        // console.log(data)
 
         if (data.verified) {
             alert("2FA Successful!")
