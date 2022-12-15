@@ -16,7 +16,8 @@ const pending_user = require("./models/pending_user")
 const { ObjectId } = require('mongodb');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const user = require('./models/user');
+const speakeasy = require('speakeasy')
+const qrcode = require('qrcode')
 
 const app = express();
 
@@ -147,12 +148,40 @@ app.get('/api/profile', auth, async function (req, res) {
     })
 });
 
+app.post('/api/enable2fa', auth, async (req, res) => {
+    const secret = speakeasy.generateSecret({ name: 'Astra Security' });
+    const url = speakeasy.otpauthURL({ secret: secret.ascii, label: req.user.email, issuer: 'Astra Security' });
+    const qr = await qrcode.toDataURL(url);
+    const this_user = await User.findOne({
+        _id: req.user._id,
+    })
+    this_user.two_fa_secret = secret.ascii;
+    await this_user.save();
+    console.log("2FA secret saved in user records.")
+    res.json({ secret: secret.ascii, qr });
+})
+
+app.post('/api/verify2fa', auth, async (req, res) => {
+    const this_user = await User.findOne({
+        _id: req.user._id,
+    })
+    const verified = speakeasy.totp.verify({
+        secret: this_user.two_fa_secret,
+        encoding: 'ascii',
+        token: req.body.token
+    });
+    if (verified) {
+        res.json({ verified: true });
+    } else {
+        res.json({ verified: false });
+    }
+})
 
 app.get('/', function (req, res) {
     res.status(200).send(`Welcome to login , sign-up api`);
 });
 
-
+// add asset
 app.post('/api/add_asset', auth, async (req, res) => {
     // console.log("Added by - ", req.user.role_id)
     if (req.user.role_id == "100") {
@@ -173,6 +202,46 @@ app.post('/api/add_asset', auth, async (req, res) => {
     }
     else {
         res.json({ status: "error", message: "you are not authorized to add an asset in the DB" })
+    }
+})
+
+// get assets
+app.get('/api/get_manager_assets', auth, async function (req, res) {
+    const assets = await asset.find({ assignor_managers: req.user._id })
+    res.json({
+        assets: assets
+    })
+});
+
+app.get('/api/remove_asset', auth, async function (req, res) {
+    try {
+        await asset.findByIdAndDelete(req.body.id);
+        res.json({ status: "ok" })
+    } catch (e) {
+        res.json({ status: "error", e })
+    }
+})
+
+// modify asset
+app.post('/api/edit_asset', auth, async (req, res) => {
+    // console.log("Added by - ", req.user.role_id)
+    if (req.user.role_id == "100") {
+        try {
+            await asset.findByIdAndUpdate(req.body.id, {
+                title: req.body.title,
+                type: req.body.type,
+                target: req.body.target,
+                description: req.body.description,
+            })
+            console.log("asset modified successfully!");
+
+            res.json({ status: "ok" })
+        } catch (error) {
+            res.json({ status: "error", error })
+        }
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to modify this asset" })
     }
 })
 
@@ -353,13 +422,7 @@ app.post('/api/reset_password', async (req, res) => {
     }
 })
 
-// get assets
-app.get('/api/get_manager_assets', auth, async function (req, res) {
-    const assets = await asset.find({ assignor_managers: req.user._id })
-    res.json({
-        assets: assets
-    })
-});
+
 
 // listening port
 const PORT = process.env.PORT || 3000;
