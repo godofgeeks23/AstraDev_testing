@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 
     invited_by: { type: String, default: null },
 
-
+    two_fa_secret: { type: String, default: null },
 
 })
 
