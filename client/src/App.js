@@ -8,6 +8,8 @@ import InvitePage from './pages/InvitePage'
 import ActivateUserPage from './pages/ActivateUser'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import EnableTwoFA from './pages/EnableTwoFA'
+import VerifyTwoFA from './pages/VerifyTwoFA'
 
 const App = () => {
     return (
@@ -23,6 +25,8 @@ const App = () => {
                     <Route path="/activateuser" element={<ActivateUserPage />} />
                     <Route path="/forgotpassword" element={<ForgotPassword />} />
                     <Route path="/resetpassword" element={<ResetPassword />} />
+                    <Route path="/enabletwofa" element={<EnableTwoFA />} />
+                    <Route path="/verifytwofa" element={<VerifyTwoFA />} />
                 </Routes>
             </BrowserRouter>
         </div>
