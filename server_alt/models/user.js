@@ -23,14 +23,16 @@ const userSchema = new mongoose.Schema({
     password2: { type: String, required: true },
     isAdmin: { type: Boolean, default: false },
     createdDate: { type: Date, default: Date.now },
-
+    rating: { type: Number, default: 0 },
     pswd_created: { type: Date, default: Date.now },
     status: { type: Boolean, default: true },
     cust_id: { type: String, default: null },
-    token: { type: String, default: null },
     role_id: { type: String, default: null },
-
     invited_by: { type: String, default: null },
+
+    token: { type: String, default: null },
+    token_created_at: { type: Date, default: Date.now },
+    token_validity: { type: Number, default: 120 }, // minutes
 
     two_fa_secret: { type: String, default: null },
 
@@ -76,10 +78,12 @@ userSchema.methods.generateToken = function (cb) {
     const token = jwt.sign({ "data": user._id }, confiq.SECRET,
         function (err, token) {
             if (err) {
-                console.log("Error in token generation - ", err);
+                console.log("Error in login token generation - ", err);
             } else {
-                console.log("Token generated.");
+                console.log("Login Token generated.");
                 user.token = token;
+                user.token_created_at = Date.now();
+
                 user.save(function (err, user) {
                     if (err) return cb(err);
                     cb(null, user);
