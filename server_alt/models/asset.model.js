@@ -14,6 +14,9 @@ const asset = new mongoose.Schema({
   description: { type: String, default: null },
   assignor_managers: { type: Array, required: true, default: [] },
   assignee_managers: { type: Array, default: [] },
+  tags: { type: Array, default: [] },
+  description_file: { type: String, default: null },
+  
 
 })
 
