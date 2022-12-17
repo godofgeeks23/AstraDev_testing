@@ -30,8 +30,6 @@ function App() {
 					<button type='submit' className='button-84'>Done</button>
 				</form>
 				<img id="qrcodeimg" src={qrurl} alt="QR Code"></img>
-				{/* add a button to navigate to /verify2fa */}
-
 				{qrurl && <button type='submit' onClick={() => window.location.href='/verifytwofa'} className='button-84'>Verify 2FA Activation</button>}
 			</div>
 
