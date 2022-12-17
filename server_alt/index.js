@@ -91,11 +91,28 @@ app.post('/api/login', function (req, res) {
     let token = req.cookies.auth;
     User.findByToken(token, (err, user) => {
         if (err) { console.log("err in fiding the token..."); }
-        if (user) return res.status(400).json({
-            error: true,
-            message: "You are already logged in"
-        });
-
+        if (user) {
+            // // check token's expiry
+            // console.log(user.token_validity)
+            // console.log("comparing current date", new Date(), "with token expiry date", new Date(user.token_created_at.getTime() + (2 * 60 * 1000)))
+            // console.log(new Date() < new Date(user.token_created_at.getTime() + (user.token_validity * 60 * 1000)))
+            if (new Date() < new Date(user.token_created_at.getTime() + (user.token_validity * 60 * 1000))) {
+                return res.status(400).json({
+                    error: true,
+                    message: "You are already logged in"
+                });
+            }
+            else {
+                // delete the expired token in the database
+                user.update({ $unset: { token: 1 } }, function (err, user) {
+                    if (err) return cb(err);
+                    return res.json({
+                        error: true,
+                        message: "Your session has expired. Please login again."
+                    });
+                })
+            }
+        }
         else {
             User.findOne({ 'email': req.body.email }, function (err, user) {
                 if (!user) return res.json({ isAuth: false, message: ' Auth failed ,email not found' });
@@ -109,8 +126,8 @@ app.post('/api/login', function (req, res) {
                         console.log("saving token auth in cookies...")
                         res.cookie('auth', user.token).json({
                             isAuth: true,
-                            id: user._id
-                            , email: user.email
+                            id: user._id,
+                            email: user.email
                         });
                     });
                 });
@@ -205,6 +222,14 @@ app.post('/api/add_asset', auth, async (req, res) => {
     }
 })
 
+// get the number of assets of a user
+app.get('/api/get_asset_count', auth, async function (req, res) {
+    const assets = await asset.find({ assignor_managers: req.user._id })
+    res.json({
+        count: assets.length
+    })
+});
+
 // get assets
 app.get('/api/get_manager_assets', auth, async function (req, res) {
     const assets = await asset.find({ assignor_managers: req.user._id })
@@ -245,7 +270,7 @@ app.post('/api/edit_asset', auth, async (req, res) => {
     }
 })
 
-app.post('/api/add_vuln', async (req, res) => {
+app.post('/api/add_vuln', auth, async (req, res) => {
     console.log(req.body)
     try {
         const new_vuln = await vulnerability.create({
@@ -256,8 +281,12 @@ app.post('/api/add_vuln', async (req, res) => {
             url: req.body.url,
             status: req.body.status,
             parent_asset: req.body.parent_asset,
-            id: req.body.id,
             description: req.body.description,
+            user_id: req.user._id,
+            cwe: req.body.cwe,
+            cvss: req.body.cvss,
+            lastModifiedByUser: req.user._id,
+            lastModifiedDate: req.body.lastModifiedDate,
         })
         console.log("vulnerability added successfully!");
         res.json({ status: "ok" })
@@ -422,7 +451,23 @@ app.post('/api/reset_password', async (req, res) => {
     }
 })
 
-
+// get security provider managers
+app.get('/api/get_sec_provider_mngrs', async function (req, res) {
+    // find security provider customers
+    const sec_provider_cust = await customer.find({
+        is_sec_provider: false,
+    })
+    console.log(sec_provider_cust)
+    // find users with customer id in sec_provider_cust and role_id = 100
+    const sec_provider_mngrs = await User.find({
+        cust_id: { $in: sec_provider_cust.map(cust => cust._id) },
+        role_id: 100,
+    })
+    res.json({
+        status: "ok",
+        sec_provider_mngrs: sec_provider_mngrs
+    })
+});
 
 // listening port
 const PORT = process.env.PORT || 3000;
