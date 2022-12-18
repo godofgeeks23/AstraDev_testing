@@ -29,11 +29,9 @@ const userSchema = new mongoose.Schema({
     cust_id: { type: String, default: null },
     role_id: { type: String, default: null },
     invited_by: { type: String, default: null },
-
     token: { type: String, default: null },
     token_created_at: { type: Date, default: Date.now },
     token_validity: { type: Number, default: 120 }, // minutes
-
     two_fa_secret: { type: String, default: null },
 
 })
