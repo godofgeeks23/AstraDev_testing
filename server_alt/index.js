@@ -286,7 +286,7 @@ app.post('/api/add_vuln', auth, async (req, res) => {
             cwe: req.body.cwe,
             cvss: req.body.cvss,
             lastModifiedByUser: req.user._id,
-            lastModifiedDate: req.body.lastModifiedDate,
+            lastModifiedDate: Date.now(),
         })
         console.log("vulnerability added successfully!");
         res.json({ status: "ok" })
@@ -455,14 +455,14 @@ app.post('/api/reset_password', async (req, res) => {
 app.get('/api/get_sec_provider_mngrs', async function (req, res) {
     // find security provider customers
     const sec_provider_cust = await customer.find({
-        is_sec_provider: false,
+        is_sec_provider: true,
     })
-    console.log(sec_provider_cust)
+    // console.log(sec_provider_cust)
     // find users with customer id in sec_provider_cust and role_id = 100
     const sec_provider_mngrs = await User.find({
         cust_id: { $in: sec_provider_cust.map(cust => cust._id) },
         role_id: 100,
-    })
+    }, {_id: 1, fname: 1})
     res.json({
         status: "ok",
         sec_provider_mngrs: sec_provider_mngrs
