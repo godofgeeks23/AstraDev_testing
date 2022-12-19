@@ -10,6 +10,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import EnableTwoFA from './pages/EnableTwoFA'
 import VerifyTwoFA from './pages/VerifyTwoFA'
+import MailSent from './pages/MailSent'
 
 const App = () => {
     return (
@@ -27,6 +28,8 @@ const App = () => {
                     <Route path="/resetpassword" element={<ResetPassword />} />
                     <Route path="/enabletwofa" element={<EnableTwoFA />} />
                     <Route path="/verifytwofa" element={<VerifyTwoFA />} />
+                    <Route path="/mailsent" element={<MailSent />} />
+
                 </Routes>
             </BrowserRouter>
         </div>
