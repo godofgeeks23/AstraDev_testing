@@ -469,6 +469,62 @@ app.get('/api/get_sec_provider_mngrs', async function (req, res) {
     })
 });
 
+// add a member to a manager's team
+app.post('/api/add_team_member', auth, async (req, res) => {
+    if (req.user.role_id == "100") {
+        const this_user = await User.findOne({
+            _id: ObjectId(req.body.user_id),
+        })
+        if (this_user.cust_id === req.user.cust_id) {
+            this_user.reporting_to = req.user._id;
+            await this_user.save();
+            res.json({ status: "ok" })
+        }
+        else {
+            res.json({ status: "error" })
+        }
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to add a member to team." })
+    }
+})
+
+// get team members of a manager
+app.get('/api/get_team_members', auth, async function (req, res) {
+    if (req.user.role_id == "100") {
+        const team_members = await User.find({
+            reporting_to: req.user._id,
+        })
+        res.json({
+            status: "ok",
+            team_members: team_members
+        })
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to view members list" })
+    }
+});
+
+// remove a member from a manager's team
+app.post('/api/remove_team_member', auth, async (req, res) => {
+    if (req.user.role_id == "100") {
+        const this_user = await User.findOne({
+            _id: ObjectId(req.body.user_id),
+        })
+        if (this_user.cust_id === req.user.cust_id) {
+            this_user.reporting_to = null;
+            await this_user.save();
+            res.json({ status: "ok" })
+        }
+        else {
+            res.json({ status: "error" })
+        }
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to remove a member from team." })
+    }
+})
+
 // listening port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
