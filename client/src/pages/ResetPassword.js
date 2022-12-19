@@ -6,6 +6,9 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useLocation } from "react-router-dom";
 import { useNavigate } from 'react-router-dom'
+import './style.css'
+import anim from './Union.png'
+import logo from './logo.png'
 
 const ResetPassword = () => {
 
@@ -42,25 +45,33 @@ const ResetPassword = () => {
     }
 
     return (
-        <div className='login_container p-5 m-5 bg-dark'>
-            <h1 className='text-center p-3'>Reset Password</h1>
-            <Form onSubmit={reset_my_password}>
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                </Form.Group>
-                <Form.Group className="mb-3" controlId="formBasicPassword2">
-                    <Form.Label>Enter again</Form.Label>
-                    <Form.Control type="password" placeholder="Password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                    Submit
-                </Button>
-            </Form>
-
+        <>
+        <div className='left'>
+            <div className='left-content'>
+            <p className='reset-heading'><b>Reset Your <br />
+            Password</b></p>
+            </div>
+            <div><img src={anim} className="anim" alt='anim' /></div>
         </div>
-    );
-
+        <div className='right'>
+            <div className='right-content'>
+           <div><h2> <img src={logo} className="logo" alt='anim' />&nbsp; Cyethack Solutions</h2></div>
+            <div className='right-content-text'>
+                <form onSubmit={reset_my_password}>
+                    <h1 style={{textAlign:"center"}}><b>Reset Your Password</b></h1>
+                    <label for="pass">New Password<br />
+                    <input type="password" className='text-area' value={password} onChange={(e) => setPassword(e.target.value)}/>
+                    </label><br />
+                    <label for="confpass">Confirm Password <br />
+                    <input type="password" className='text-area' value={password2} onChange={(e) => setPassword2(e.target.value)}/>
+                    </label><br />
+                    <button type='submit' className='button-84'>Next Step</button>
+                </form>
+            </div> 
+            </div>
+        </div>
+        </>
+      ) 
 }
 
 export default ResetPassword
