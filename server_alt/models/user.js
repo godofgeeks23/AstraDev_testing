@@ -31,8 +31,9 @@ const userSchema = new mongoose.Schema({
     invited_by: { type: String, default: null },
     token: { type: String, default: null },
     token_created_at: { type: Date, default: Date.now },
-    token_validity: { type: Number, default: 120 }, // minutes
+    token_validity: { type: Number, default: 120 }, // in minutes
     two_fa_secret: { type: String, default: null },
+    reporting_to: { type: String, default: null },  // manager id to whom this user reports
 
 })
 
