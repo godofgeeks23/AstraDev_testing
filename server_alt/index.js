@@ -233,12 +233,28 @@ app.get('/api/get_asset_count', auth, async function (req, res) {
 // get assets
 app.get('/api/get_manager_assets', auth, async function (req, res) {
     const assets = await asset.find({ assignor_managers: req.user._id })
+    var assets_list = [];
+    for (var i = 0; i < assets.length; i++) {
+        const asset_vulns = await vulnerability.find({ parent_asset: assets[i]._id })
+        const total_vuln = asset_vulns.length;
+        const thisasset = {
+            id: assets[i]._id,
+            title: assets[i].title,
+            description: assets[i].description,
+            total_vuln: total_vuln,
+            critical_vuln: asset_vulns.filter(vuln => vuln.severity == "critical").length,
+            high_vuln: asset_vulns.filter(vuln => vuln.severity == "high").length,
+            medium_vuln: asset_vulns.filter(vuln => vuln.severity == "medium").length,
+            low_vuln: asset_vulns.filter(vuln => vuln.severity == "low").length,
+        }
+        assets_list.push(thisasset);
+    }
     res.json({
-        assets: assets
+        assets: assets_list
     })
 });
 
-app.get('/api/remove_asset', auth, async function (req, res) {
+app.post('/api/remove_asset', auth, async function (req, res) {
     try {
         await asset.findByIdAndDelete(req.body.id);
         res.json({ status: "ok" })
@@ -286,9 +302,41 @@ app.post('/api/add_vuln', auth, async (req, res) => {
             cwe: req.body.cwe,
             cvss: req.body.cvss,
             lastModifiedByUser: req.user._id,
-            lastModifiedDate: Date.now(),
+            lastModifiedDate: req.body.created_date,
         })
         console.log("vulnerability added successfully!");
+        res.json({ status: "ok" })
+    } catch (error) {
+        res.json({ status: "error", error })
+    }
+})
+
+app.post('/api/remove_vulnerability', async function (req, res) {
+    try {
+        await vulnerability.findByIdAndDelete(req.body.id);
+        res.json({ status: "ok" })
+    } catch (e) {
+        res.json({ status: "error", e })
+    }
+})
+
+// modify vulnerability
+app.post('/api/edit_vulnerability', async (req, res) => {
+    try {
+        await vulnerability.findByIdAndUpdate(req.body.id, {
+            type: req.body.type,
+            name: req.body.name,
+            severity: req.body.severity,
+            url: req.body.url,
+            status: req.body.status,
+            parent_asset: req.body.parent_asset,
+            description: req.body.description,
+            cwe: req.body.cwe,
+            cvss: req.body.cvss,
+            lastModifiedByUser: req.user._id,
+            lastModifiedDate: req.body.created_date,
+        })
+        console.log("vulnerability modified successfully!");
         res.json({ status: "ok" })
     } catch (error) {
         res.json({ status: "error", error })
@@ -462,7 +510,7 @@ app.get('/api/get_sec_provider_mngrs', async function (req, res) {
     const sec_provider_mngrs = await User.find({
         cust_id: { $in: sec_provider_cust.map(cust => cust._id) },
         role_id: 100,
-    }, {_id: 1, fname: 1})
+    }, { _id: 1, fname: 1 })
     res.json({
         status: "ok",
         sec_provider_mngrs: sec_provider_mngrs
