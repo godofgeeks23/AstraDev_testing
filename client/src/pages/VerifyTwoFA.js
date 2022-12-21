@@ -1,11 +1,5 @@
 import { useState } from 'react'
-// import '../App.css'
-import { isExpired, decodeToken } from "react-jwt";
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import './style.css'
-import anim from './Union.png'
-import logo from './logo.png'
 
 function App() {
 
