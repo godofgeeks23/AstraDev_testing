@@ -72,7 +72,7 @@ const InvitePage = (props) => {
 			invited_by: "63762ddbb7e0efa6b95168cd",
 			validity: "24"
 		}
-		const response = await fetch('http://localhost:3000/api/create_pending_user', {
+		const response = await fetch('http://localhost:3000/api/createPendingUser', {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
