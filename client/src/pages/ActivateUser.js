@@ -14,7 +14,7 @@ const ActivateUserPage = () => {
     async function validateUser() {
         
         const req_body = { pending_user_id: token }
-        const response = await fetch('http://localhost:3000/api/validate_pending_user', {
+        const response = await fetch('http://localhost:3000/api/validatePendingUser', {
             method: 'POST',
             credentials: 'include',
             headers: {
