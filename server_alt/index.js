@@ -165,7 +165,7 @@ app.get('/api/profile', auth, async function (req, res) {
     })
 });
 
-app.post('/api/enable2fa', auth, async (req, res) => {
+app.post('/api/enable2FA', auth, async (req, res) => {
     const secret = speakeasy.generateSecret({ name: 'Astra Security' });
     const url = speakeasy.otpauthURL({ secret: secret.ascii, label: req.user.email, issuer: 'Astra Security' });
     const qr = await qrcode.toDataURL(url);
@@ -178,7 +178,7 @@ app.post('/api/enable2fa', auth, async (req, res) => {
     res.json({ secret: secret.ascii, qr });
 })
 
-app.post('/api/verify2fa', auth, async (req, res) => {
+app.post('/api/verify2FA', auth, async (req, res) => {
     const this_user = await User.findOne({
         _id: req.user._id,
     })
@@ -199,7 +199,7 @@ app.get('/', function (req, res) {
 });
 
 // add asset
-app.post('/api/add_asset', auth, async (req, res) => {
+app.post('/api/addAsset', auth, async (req, res) => {
     // console.log("Added by - ", req.user.role_id)
     if (req.user.role_id == "100") {
         try {
@@ -223,7 +223,7 @@ app.post('/api/add_asset', auth, async (req, res) => {
 })
 
 // get the number of assets of a user
-app.get('/api/get_asset_count', auth, async function (req, res) {
+app.get('/api/getAssetCount', auth, async function (req, res) {
     const assets = await asset.find({ assignor_managers: req.user._id })
     res.json({
         count: assets.length
@@ -231,7 +231,7 @@ app.get('/api/get_asset_count', auth, async function (req, res) {
 });
 
 // get assets
-app.get('/api/get_manager_assets', auth, async function (req, res) {
+app.get('/api/getManagerAssets', auth, async function (req, res) {
     const assets = await asset.find({ assignor_managers: req.user._id })
     var assets_list = [];
     for (var i = 0; i < assets.length; i++) {
@@ -254,7 +254,7 @@ app.get('/api/get_manager_assets', auth, async function (req, res) {
     })
 });
 
-app.post('/api/remove_asset', auth, async function (req, res) {
+app.post('/api/removeAsset', auth, async function (req, res) {
     try {
         await asset.findByIdAndDelete(req.body.id);
         res.json({ status: "ok" })
@@ -264,7 +264,7 @@ app.post('/api/remove_asset', auth, async function (req, res) {
 })
 
 // modify asset
-app.post('/api/edit_asset', auth, async (req, res) => {
+app.post('/api/editAsset', auth, async (req, res) => {
     // console.log("Added by - ", req.user.role_id)
     if (req.user.role_id == "100") {
         try {
@@ -286,7 +286,7 @@ app.post('/api/edit_asset', auth, async (req, res) => {
     }
 })
 
-app.post('/api/add_vuln', auth, async (req, res) => {
+app.post('/api/addVulnerability', auth, async (req, res) => {
     console.log(req.body)
     try {
         const new_vuln = await vulnerability.create({
@@ -311,7 +311,7 @@ app.post('/api/add_vuln', auth, async (req, res) => {
     }
 })
 
-app.post('/api/remove_vulnerability', async function (req, res) {
+app.post('/api/removeVulnerability', async function (req, res) {
     try {
         await vulnerability.findByIdAndDelete(req.body.id);
         res.json({ status: "ok" })
@@ -321,7 +321,7 @@ app.post('/api/remove_vulnerability', async function (req, res) {
 })
 
 // modify vulnerability
-app.post('/api/edit_vulnerability', async (req, res) => {
+app.post('/api/editVulnerability', async (req, res) => {
     try {
         await vulnerability.findByIdAndUpdate(req.body.id, {
             type: req.body.type,
@@ -343,7 +343,7 @@ app.post('/api/edit_vulnerability', async (req, res) => {
     }
 })
 
-app.post('/api/add_role', async (req, res) => {
+app.post('/api/addRole', async (req, res) => {
     console.log(req.body)
     try {
         const new_role = await role.create({
@@ -358,7 +358,7 @@ app.post('/api/add_role', async (req, res) => {
     }
 })
 
-app.post('/api/add_customer', async (req, res) => {
+app.post('/api/addCustomer', async (req, res) => {
     console.log(req.body)
     try {
         const new_customer = await customer.create({
@@ -373,7 +373,7 @@ app.post('/api/add_customer', async (req, res) => {
     }
 })
 
-app.post('/api/add_comment', auth, async (req, res) => {
+app.post('/api/addComment', auth, async (req, res) => {
     console.log(req.body)
     try {
         const new_activity = await activity.create({
@@ -417,7 +417,7 @@ app.get('/api/test_nesting', auth, async function (req, res) {
 });
 
 
-app.post('/api/create_pending_user', async (req, res) => {
+app.post('/api/createPendingUser', async (req, res) => {
     console.log(req.body)
     try {
         const new_pending_user = await pending_user.create({
@@ -433,7 +433,7 @@ app.post('/api/create_pending_user', async (req, res) => {
     }
 })
 
-app.post('/api/validate_pending_user', async (req, res) => {
+app.post('/api/validatePendingUser', async (req, res) => {
     // console.log(req.body)
     const thispendinguser = await pending_user.findOne({
         _id: ObjectId(req.body.pending_user_id),
@@ -452,7 +452,7 @@ app.post('/api/validate_pending_user', async (req, res) => {
     }
 })
 
-app.post('/api/reset_password_token', async (req, res) => {
+app.post('/api/resetPasswordToken', async (req, res) => {
     // console.log(req.body)
     try {
         const forgot_user = await User.findOne({
@@ -468,7 +468,7 @@ app.post('/api/reset_password_token', async (req, res) => {
     }
 })
 
-app.post('/api/reset_password', async (req, res) => {
+app.post('/api/resetPassword', async (req, res) => {
     try {
         const forgot_user = await User.findOne({
             email: req.body.email,
@@ -500,7 +500,7 @@ app.post('/api/reset_password', async (req, res) => {
 })
 
 // get security provider managers
-app.get('/api/get_sec_provider_mngrs', async function (req, res) {
+app.get('/api/getSecProviderMngrs', async function (req, res) {
     // find security provider customers
     const sec_provider_cust = await customer.find({
         is_sec_provider: true,
@@ -518,7 +518,7 @@ app.get('/api/get_sec_provider_mngrs', async function (req, res) {
 });
 
 // add a member to a manager's team
-app.post('/api/add_team_member', auth, async (req, res) => {
+app.post('/api/addTeamMember', auth, async (req, res) => {
     if (req.user.role_id == "100") {
         const this_user = await User.findOne({
             _id: ObjectId(req.body.user_id),
@@ -538,7 +538,7 @@ app.post('/api/add_team_member', auth, async (req, res) => {
 })
 
 // get team members of a manager
-app.get('/api/get_team_members', auth, async function (req, res) {
+app.get('/api/getTeamMembers', auth, async function (req, res) {
     if (req.user.role_id == "100") {
         const team_members = await User.find({
             reporting_to: req.user._id,
@@ -554,7 +554,7 @@ app.get('/api/get_team_members', auth, async function (req, res) {
 });
 
 // remove a member from a manager's team
-app.post('/api/remove_team_member', auth, async (req, res) => {
+app.post('/api/removeTeamMember', auth, async (req, res) => {
     if (req.user.role_id == "100") {
         const this_user = await User.findOne({
             _id: ObjectId(req.body.user_id),
