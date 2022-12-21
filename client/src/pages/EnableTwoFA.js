@@ -10,7 +10,7 @@ function App() {
 	async function enablemytwofa(event) {
 		event.preventDefault()
 		console.log("enablemytwofa function called")
-		const response = await fetch('http://localhost:3000/api/enable2fa', {
+		const response = await fetch('http://localhost:3000/api/enable2FA', {
 			method: 'POST',
 			credentials: 'include',
 			headers: {
