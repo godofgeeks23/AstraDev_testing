@@ -15,7 +15,7 @@ function App() {
 
         event.preventDefault()
 
-        const response = await fetch('http://localhost:3000/api/verify2fa', {
+        const response = await fetch('http://localhost:3000/api/verify2FA', {
             method: 'POST',
             credentials: 'include',
             headers: {
