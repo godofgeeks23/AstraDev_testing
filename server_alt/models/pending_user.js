@@ -8,6 +8,11 @@ const pending_user = new mongoose.Schema({
     invited_by: { type: String, required: true },
     invite_date: { type: Date, default: Date.now },
     validity: { type: Number },
+    expireAt: {
+        type: Date,
+        default: Date.now,
+        index: { expires: '1m' },
+      },
 
 })
 
