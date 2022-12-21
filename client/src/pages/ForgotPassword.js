@@ -50,7 +50,7 @@ const ForgotPassword = () => {
         event.preventDefault()
 
         const req_body = { email: email, }
-        const response = await fetch('http://localhost:3000/api/reset_password_token', {
+        const response = await fetch('http://localhost:3000/api/resetPasswordToken', {
             method: 'POST',
             credentials: 'include',
             headers: {
