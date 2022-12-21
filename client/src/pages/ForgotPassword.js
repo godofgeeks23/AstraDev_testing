@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import '../App.css'
-import Cookies from 'js-cookie';
-import Access_denied from './components/AccessDenied';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import anim from './Union.png'
 import logo from './logo.png'
 import './style.css'
