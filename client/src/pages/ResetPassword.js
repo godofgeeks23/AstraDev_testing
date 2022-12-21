@@ -28,7 +28,7 @@ const ResetPassword = () => {
             password: password,
             password2: password2,
         }
-        const response = await fetch('http://localhost:3000/api/reset_password', {
+        const response = await fetch('http://localhost:3000/api/resetPassword', {
             method: 'POST',
             credentials: 'include',
             headers: {
