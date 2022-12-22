@@ -222,38 +222,6 @@ app.post('/api/addAsset', auth, async (req, res) => {
     }
 })
 
-// get the number of assets of a user
-app.get('/api/getAssetCount', auth, async function (req, res) {
-    const assets = await asset.find({ assignor_managers: req.user._id })
-    res.json({
-        count: assets.length
-    })
-});
-
-// get assets
-app.get('/api/getManagerAssets', auth, async function (req, res) {
-    const assets = await asset.find({ assignor_managers: req.user._id })
-    var assets_list = [];
-    for (var i = 0; i < assets.length; i++) {
-        const asset_vulns = await vulnerability.find({ parent_asset: assets[i]._id })
-        const total_vuln = asset_vulns.length;
-        const thisasset = {
-            id: assets[i]._id,
-            title: assets[i].title,
-            description: assets[i].description,
-            total_vuln: total_vuln,
-            critical_vuln: asset_vulns.filter(vuln => vuln.severity == "critical").length,
-            high_vuln: asset_vulns.filter(vuln => vuln.severity == "high").length,
-            medium_vuln: asset_vulns.filter(vuln => vuln.severity == "medium").length,
-            low_vuln: asset_vulns.filter(vuln => vuln.severity == "low").length,
-        }
-        assets_list.push(thisasset);
-    }
-    res.json({
-        assets: assets_list
-    })
-});
-
 app.post('/api/removeAsset', auth, async function (req, res) {
     try {
         await asset.findByIdAndDelete(req.body.id);
@@ -285,6 +253,35 @@ app.post('/api/editAsset', auth, async (req, res) => {
         res.json({ status: "error", message: "you are not authorized to modify this asset" })
     }
 })
+
+// get assets
+app.get('/api/getManagerAssets', auth, async function (req, res) {
+    const assets = await asset.find({ assignor_managers: req.user._id })
+    var assets_list = [];
+    var total_vuln_count = 0;
+    assets.forEach(async (asset) => {
+        const asset_vulns = await vulnerability.find({ parent_asset: asset._id })
+        total_vuln_count += asset_vulns.length;
+        const thisasset = {
+            id: asset._id,
+            title: asset.title,
+            description: asset.description,
+            asset_vuln_count: asset_vulns.length,
+            critical_vuln_count: asset_vulns.filter(vuln => vuln.severity == "critical").length,
+            high_vuln_count: asset_vulns.filter(vuln => vuln.severity == "high").length,
+            medium_vuln_count: asset_vulns.filter(vuln => vuln.severity == "medium").length,
+            low_vuln_count: asset_vulns.filter(vuln => vuln.severity == "low").length,
+        }
+        assets_list.push(thisasset);
+        if (assets_list.length == assets.length) {
+            res.json({
+                total_asset_count: assets.length,
+                total_vuln_count: total_vuln_count,
+                assets: assets_list,
+            })
+        }
+    })
+});
 
 app.post('/api/addVulnerability', auth, async (req, res) => {
     console.log(req.body)
