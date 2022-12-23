@@ -34,6 +34,8 @@ const userSchema = new mongoose.Schema({
     token_validity: { type: Number, default: 120 }, // in minutes
     two_fa_secret: { type: String, default: null },
     reporting_to: { type: String, default: null },  // manager id to whom this user reports
+    rating: { type: Number, default: 0 },      // rating of the user
+    
 
 })
 
