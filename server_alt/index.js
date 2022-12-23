@@ -255,32 +255,62 @@ app.post('/api/editAsset', auth, async (req, res) => {
 })
 
 // get assets
-app.get('/api/getManagerAssets', auth, async function (req, res) {
-    const assets = await asset.find({ assignor_managers: req.user._id })
-    var assets_list = [];
-    var total_vuln_count = 0;
-    assets.forEach(async (asset) => {
-        const asset_vulns = await vulnerability.find({ parent_asset: asset._id })
-        total_vuln_count += asset_vulns.length;
-        const thisasset = {
-            id: asset._id,
-            title: asset.title,
-            description: asset.description,
-            asset_vuln_count: asset_vulns.length,
-            critical_vuln_count: asset_vulns.filter(vuln => vuln.severity == "critical").length,
-            high_vuln_count: asset_vulns.filter(vuln => vuln.severity == "high").length,
-            medium_vuln_count: asset_vulns.filter(vuln => vuln.severity == "medium").length,
-            low_vuln_count: asset_vulns.filter(vuln => vuln.severity == "low").length,
-        }
-        assets_list.push(thisasset);
-        if (assets_list.length == assets.length) {
-            res.json({
-                total_asset_count: assets.length,
-                total_vuln_count: total_vuln_count,
-                assets: assets_list,
-            })
-        }
-    })
+app.post('/api/getManagerAssets', auth, async function (req, res) {
+    console.log(req.body.asset_id)
+    if (req.body.targets == "all") {
+        const assets = await asset.find({ assignor_managers: req.user._id })
+        var assets_list = [];
+        var total_vuln_count = 0;
+        assets.forEach(async (asset) => {
+            const asset_vulns = await vulnerability.find({ parent_asset: asset._id })
+            total_vuln_count += asset_vulns.length;
+            const thisasset = {
+                id: asset._id,
+                title: asset.title,
+                description: asset.description,
+                asset_vuln_count: asset_vulns.length,
+                critical_vuln_count: asset_vulns.filter(vuln => vuln.severity == "critical").length,
+                high_vuln_count: asset_vulns.filter(vuln => vuln.severity == "high").length,
+                medium_vuln_count: asset_vulns.filter(vuln => vuln.severity == "medium").length,
+                low_vuln_count: asset_vulns.filter(vuln => vuln.severity == "low").length,
+            }
+            assets_list.push(thisasset);
+            if (assets_list.length == assets.length) {
+                res.json({
+                    total_asset_count: assets.length,
+                    total_vuln_count: total_vuln_count,
+                    assets: assets_list,
+                })
+            }
+        })
+    }
+    else {
+        const assets = await asset.find({ assignor_managers: req.user._id, _id: req.body.targets })
+        var assets_list = [];
+        var total_vuln_count = 0;
+        assets.forEach(async (asset) => {
+            const asset_vulns = await vulnerability.find({ parent_asset: asset._id })
+            total_vuln_count += asset_vulns.length;
+            const thisasset = {
+                id: asset._id,
+                title: asset.title,
+                description: asset.description,
+                asset_vuln_count: asset_vulns.length,
+                critical_vuln_count: asset_vulns.filter(vuln => vuln.severity == "critical").length,
+                high_vuln_count: asset_vulns.filter(vuln => vuln.severity == "high").length,
+                medium_vuln_count: asset_vulns.filter(vuln => vuln.severity == "medium").length,
+                low_vuln_count: asset_vulns.filter(vuln => vuln.severity == "low").length,
+            }
+            assets_list.push(thisasset);
+            if (assets_list.length == assets.length) {
+                res.json({
+                    total_asset_count: assets.length,
+                    total_vuln_count: total_vuln_count,
+                    assets: assets_list,
+                })
+            }
+        })
+    }
 });
 
 app.post('/api/addVulnerability', auth, async (req, res) => {
