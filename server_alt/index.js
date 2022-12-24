@@ -13,6 +13,7 @@ const customer = require('./models/customer')
 const comment = require('./models/comment')
 const activity = require("./models/activity.model")
 const pending_user = require("./models/pending_user")
+const vuln_researcher_relation = require("./models/vulnerability_researcher_relations")
 const { ObjectId } = require('mongodb');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -21,37 +22,10 @@ const qrcode = require('qrcode')
 
 const app = express();
 
-// app use
 app.use(cors({ origin: 'http://localhost:3001', credentials: true, exposedHeaders: ['Set-Cookie', 'Date', 'ETag'] }))
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(bodyparser.json());
 app.use(cookieParser());
-
-// app.use(function (req, res, next) {
-//     res.header('Content-Type', 'application/json;charset=UTF-8')
-//     res.header('Access-Control-Allow-Credentials', true)
-//     res.header(
-//         'Access-Control-Allow-Headers',
-//         'Origin, X-Requested-With, Content-Type, Accept'
-//     )
-//     next()
-// })
-
-// app.use((req, res, next) => {
-//     res.setHeader("Access-Control-Allow-Origin", 'http://localhost:3001')
-//     res.setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Type, Accept');
-//     res.setHeader("Access-Control-Allow-Methods", "GET, POST");
-//     res.setHeader("Access-Control-Allow-Credentials", "true");
-//     res.setHeader("Access-Control-Expose-Headers", "ETag");
-//     if ('OPTIONS' == req.method) {
-//         res.sendStatus(200);
-//       }
-//       else {
-//         next();
-//       }
-//     // next();
-// })
-
 
 // database connection
 mongoose.Promise = global.Promise;
@@ -361,7 +335,7 @@ app.post('/api/editVulnerability', async (req, res) => {
             cwe: req.body.cwe,
             cvss: req.body.cvss,
             lastModifiedByUser: req.user._id,
-            lastModifiedDate: req.body.created_date,
+            lastModifiedDate: Date.now(),
         })
         console.log("vulnerability modified successfully!");
         res.json({ status: "ok" })
@@ -369,6 +343,59 @@ app.post('/api/editVulnerability', async (req, res) => {
         res.json({ status: "error", error })
     }
 })
+
+// assign vulnerability to user
+app.post('/api/assignVulnerability', auth, async (req, res) => {
+    // check if user is manager
+    if (req.user.role_id == "100") {
+        //  check if user with given researcher id exists
+        const researcher = await User.findOne({ _id: req.body.researcher_id, role_id: "102" })
+        if (!researcher) { res.json({ status: "error", error: "Researcher does not exist." }) }
+        else {
+            // check if researcher is in manager's team
+            if (researcher.reporting_to == req.user._id) {
+                try {
+                    // create a document in vuln_researcher_relation collection
+                    const new_relation = await vuln_researcher_relation.create({
+                        vuln_id: req.body.vuln_id,
+                        researcher_id: req.body.researcher_id,
+                        reporting_manager: req.user._id,
+                    })
+                    // send OK response
+                    res.json({ status: "ok" })
+                }
+                catch (error) { res.json({ status: "error", error }) }
+            }
+            else { res.json({ status: "error", error: "Researcher is not in your team." }) }
+        }
+    }
+    else { res.json({ status: "error", error: "You are not authorized for assignment operations." }) }
+})
+
+// unassign vulnerability from user
+app.post('/api/unassignVulnerability', auth, async (req, res) => {
+    // check if user is manager
+    if (req.user.role_id == "100") {
+        //  check if user with given researcher id exists
+        const researcher = await User({ _id: req.body.researcher_id, role_id: "102" })
+        if (!researcher) { res.json({ status: "error", error: "Researcher does not exist." }) }
+        else {
+            // check if researcher is in manager's team
+            if (researcher.reporting_to == req.user._id) {
+                try {
+                    // delete document from vuln_researcher_relation collection
+                    await vuln_researcher_relation.deleteOne({ vuln_id: req.body.vuln_id, researcher_id: req.body.researcher_id })
+                    // send OK response
+                    res.json({ status: "ok" })
+                }
+                catch (error) { res.json({ status: "error", error }) }
+            }
+            else { res.json({ status: "error", error: "Researcher is not in your team." }) }
+        }
+    }
+    else { res.json({ status: "error", error: "You are not authorized for assignment operations." }) }
+})
+
 
 app.post('/api/addRole', async (req, res) => {
     console.log(req.body)
