@@ -10,36 +10,22 @@ const ForgotPassword = () => {
 
     async function sendResetPassMail(dest, token) {
         const req_body = {
-            source: "support@cyethack.com",
-            destinations: [dest],
-            subject: "Password Reset Request",
-            body: "Reset Password",
-            html: "<h1>Visit http://localhost:3001/resetpassword?email=" + dest + "&token=" + token + " to reset your password.<h1>",
+            destination: dest,
+            token: token,
         }
-        fetch('https://qet85fubbi.execute-api.ap-south-1.amazonaws.com/dev/sendemail', {
+        const response = await fetch('http://localhost:3000/api/sendResetPasswordMail', {
             method: 'POST',
             // credentials: 'include',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(req_body)
-        }).then((res) => {
-            res.json().then((data) => {
-                console.log("Response returned by Mailing API: ", data)
-                if (data.message_id) {
-                    alert("Check Your Mail!")
-                } else {
-                    alert("Unable to send mail!")
-                }
-            })
         })
-        // const data = await response.json()
-        // console.log("got response: ", data)
-        // if (data.message_id) {
-        //     alert("Check Your Mail!")
-        // } else {
-        //     alert("Unable to send mail!")
-        // }
+        const data = await response.json()
+        if (data.status == "ok") {
+            alert("Check Your Mail!")
+            // navigate('/login')
+        } else { alert("Unable to send mail!") }
     }
 
     async function getresetpasstoken(event) {
@@ -57,7 +43,7 @@ const ForgotPassword = () => {
         // redirect to /mailsent
         const data = await response.json()
         console.log(data)
-        window.location.href = '/mailsent'
+        // window.location.href = '/mailsent'
         if (data.status == "ok") {
             // alert("Visit http://localhost:3001/resetpassword?email=" + email + "&token=" + data.pswd_reset_token + " to reset your password.")
             sendResetPassMail(email, data.pswd_reset_token)
