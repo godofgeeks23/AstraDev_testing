@@ -462,14 +462,14 @@ app.post('/api/addComment', auth, async (req, res) => {
     }
 })
 
-app.get('/api/test_nesting', auth, async function (req, res) {
+app.get('/api/test_nesting', async function (req, res) {
 
-    console.log("can access test_nesting api if 'auth' is set to " + auth)
-    res.json({
-        status: "ok"
-    })
+    // console.log("can access test_nesting api if 'auth' is set to " + auth)
+    // res.json({
+    //     status: "ok"
+    // })
+
 });
-
 
 app.post('/api/createPendingUser', async (req, res) => {
     console.log(req.body)
@@ -625,6 +625,31 @@ app.post('/api/removeTeamMember', auth, async (req, res) => {
     else {
         res.json({ status: "error", message: "you are not authorized to remove a member from team." })
     }
+})
+
+// send reset password mail
+app.post('/api/sendResetPasswordMail', async (req, res) => {
+    const req_body = {
+        source: "support@cyethack.com",
+        destinations: [req.body.destination],
+        subject: "Password Reset Request",
+        body: "Reset Password",
+        html: "<h1>Visit http://localhost:3001/resetpassword?email=" + req.body.destination + "&token=" + req.body.token + " to reset your password.<h1>",
+    }
+    fetch('https://qet85fubbi.execute-api.ap-south-1.amazonaws.com/dev/sendemail', {
+        method: 'POST',
+        // credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(req_body)
+    }).then((r) => {
+        r.json().then((data) => {
+            console.log("Response returned by Mailing API: ", data)
+            if (data.message_id) { res.json({ status: "ok" }) }
+            else { res.json({ status: "error", error: "unable to send mail" }) }
+        })
+    })
 })
 
 // listening port
