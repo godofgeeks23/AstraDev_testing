@@ -396,7 +396,6 @@ app.post('/api/unassignVulnerability', auth, async (req, res) => {
     else { res.json({ status: "error", error: "You are not authorized for assignment operations." }) }
 })
 
-
 app.post('/api/addRole', async (req, res) => {
     console.log(req.body)
     try {
