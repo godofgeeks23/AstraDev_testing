@@ -628,12 +628,21 @@ app.post('/api/removeTeamMember', auth, async (req, res) => {
 
 // send reset password mail
 app.post('/api/sendResetPasswordMail', async (req, res) => {
+    const forgot_user = await User.findOne({
+        email: req.body.email,
+    })
+    const reset_token_plain = forgot_user._id + forgot_user.email;
+    const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
+
+    // console.log("Reset token generated (" + reset_token_hashed + ") !");
+    // res.json({ pswd_reset_token: reset_token_hashed, status: "ok" })
+
     const req_body = {
         source: "support@cyethack.com",
-        destinations: [req.body.destination],
+        destinations: [req.body.email],
         subject: "Password Reset Request",
         body: "Reset Password",
-        html: "<h1>Visit http://localhost:3001/resetpassword?email=" + req.body.destination + "&token=" + req.body.token + " to reset your password.<h1>",
+        html: "<h1>Visit http://localhost:3001/resetpassword?email=" + req.body.destination + "&token=" + reset_token_hashed + " to reset your password.<h1>",
     }
     fetch('https://qet85fubbi.execute-api.ap-south-1.amazonaws.com/dev/sendemail', {
         method: 'POST',
