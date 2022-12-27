@@ -17,6 +17,12 @@ const asset = new mongoose.Schema({
   tags: { type: Array, default: [] },
   description_file: { type: String, default: null },
   
+  website_url: { type: String, default: null },
+  postman_api_file: { type: String, default: null },
+  ip_range: { type: String, default: null },
+  app_store_url: { type: String, default: null },
+  app_file: { type: String, default: null },
+
 
 })
 
