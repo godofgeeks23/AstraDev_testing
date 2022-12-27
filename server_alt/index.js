@@ -13,7 +13,7 @@ const customer = require('./models/customer')
 const comment = require('./models/comment')
 const activity = require("./models/activity.model")
 const pending_user = require("./models/pending_user")
-const vuln_researcher_relation = require("./models/vulnerability_researcher_relations")
+const asset_researcher_relation = require("./models/asset_researcher_relations")
 const { ObjectId } = require('mongodb');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
@@ -344,8 +344,8 @@ app.post('/api/editVulnerability', async (req, res) => {
     }
 })
 
-// assign vulnerability to user
-app.post('/api/assignVulnerability', auth, async (req, res) => {
+// assign asset to user
+app.post('/api/assignAsset', auth, async (req, res) => {
     // check if user is manager
     if (req.user.role_id == "100") {
         //  check if user with given researcher id exists
@@ -355,9 +355,9 @@ app.post('/api/assignVulnerability', auth, async (req, res) => {
             // check if researcher is in manager's team
             if (researcher.reporting_to == req.user._id) {
                 try {
-                    // create a document in vuln_researcher_relation collection
-                    const new_relation = await vuln_researcher_relation.create({
-                        vuln_id: req.body.vuln_id,
+                    // create a document in asset_researcher_relation collection
+                    const new_relation = await asset_researcher_relation.create({
+                        asset_id: req.body.asset_id,
                         researcher_id: req.body.researcher_id,
                         reporting_manager: req.user._id,
                     })
@@ -372,7 +372,7 @@ app.post('/api/assignVulnerability', auth, async (req, res) => {
     else { res.json({ status: "error", error: "You are not authorized for assignment operations." }) }
 })
 
-// unassign vulnerability from user
+// unassign asset from user
 app.post('/api/unassignVulnerability', auth, async (req, res) => {
     // check if user is manager
     if (req.user.role_id == "100") {
@@ -383,8 +383,8 @@ app.post('/api/unassignVulnerability', auth, async (req, res) => {
             // check if researcher is in manager's team
             if (researcher.reporting_to == req.user._id) {
                 try {
-                    // delete document from vuln_researcher_relation collection
-                    await vuln_researcher_relation.deleteOne({ vuln_id: req.body.vuln_id, researcher_id: req.body.researcher_id })
+                    // delete document from asset_researcher_relation collection
+                    await asset_researcher_relation.deleteOne({ asset_id: req.body.asset_id, researcher_id: req.body.researcher_id })
                     // send OK response
                     res.json({ status: "ok" })
                 }
@@ -505,22 +505,6 @@ app.post('/api/validatePendingUser', async (req, res) => {
     }
 })
 
-app.post('/api/resetPasswordToken', async (req, res) => {
-    // console.log(req.body)
-    try {
-        const forgot_user = await User.findOne({
-            email: req.body.email,
-        })
-        const reset_token_plain = forgot_user._id + forgot_user.email;
-        const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
-
-        // console.log("Reset token generated (" + reset_token_hashed + ") !");
-        res.json({ pswd_reset_token: reset_token_hashed, status: "ok" })
-    } catch (error) {
-        res.json({ status: "error", error })
-    }
-})
-
 app.post('/api/resetPassword', async (req, res) => {
     try {
         const forgot_user = await User.findOne({
@@ -633,10 +617,6 @@ app.post('/api/sendResetPasswordMail', async (req, res) => {
     })
     const reset_token_plain = forgot_user._id + forgot_user.email;
     const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
-
-    // console.log("Reset token generated (" + reset_token_hashed + ") !");
-    // res.json({ pswd_reset_token: reset_token_hashed, status: "ok" })
-
     const req_body = {
         source: "support@cyethack.com",
         destinations: [req.body.email],
