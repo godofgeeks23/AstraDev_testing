@@ -19,7 +19,6 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const speakeasy = require('speakeasy')
 const qrcode = require('qrcode')
-const geoip = require('geoip-lite');
 const fetch = require('node-fetch');
 const login_activity = require('./models/login_activity');
 
