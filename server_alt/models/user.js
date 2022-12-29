@@ -19,26 +19,25 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    password: { type: String, required: true },
-    password2: { type: String, required: true },
-    isAdmin: { type: Boolean, default: false },
-    createdDate: { type: Date, default: Date.now },
-    rating: { type: Number, default: 0 },
-    pswd_created: { type: Date, default: Date.now },
-    status: { type: Boolean, default: true },
-    cust_id: { type: String, default: null },
-    role_id: { type: String, default: null },
-    invited_by: { type: String, default: null },
-    token: { type: String, default: null },
-    token_created_at: { type: Date, default: Date.now },
+    password: { type: String, required: true },  // password
+    password2: { type: String, required: true },    // confirm password
+    isAdmin: { type: Boolean, default: false }, // true - admin, false - user
+    createdDate: { type: Date, default: Date.now }, // date of creation of user
+    rating: { type: Number, default: 0 },   // rating of the user
+    pswd_created: { type: Date, default: Date.now },    // password creation time
+    status: { type: Boolean, default: true },   // true - active, false - inactive
+    cust_id: { type: String, default: null },   // company id to which this user belongs
+    role_id: { type: String, default: null },   // role id of this user
+    invited_by: { type: String, default: null },    // user id who invited this user
+    token: { type: String, default: null },    // token for login
+    token_created_at: { type: Date, default: Date.now },    // token creation time
     token_validity: { type: Number, default: 120 }, // in minutes
-    two_fa_secret: { type: String, default: null },
+    two_fa_secret: { type: String, default: null }, // two factor authentication secret
     reporting_to: { type: String, default: null },  // manager id to whom this user reports
     rating: { type: Number, default: 0 },      // rating of the user
     
 
 })
-
 
 // to signup a user
 userSchema.pre('save', function (next) {
