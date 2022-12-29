@@ -21,6 +21,7 @@ const speakeasy = require('speakeasy')
 const qrcode = require('qrcode')
 const fetch = require('node-fetch');
 const login_activity = require('./models/login_activity');
+const Cvss = require('cvss-calculator');
 
 const app = express();
 
@@ -499,11 +500,12 @@ app.get('/api/test_nesting', async function (req, res) {
 
     var fetch_res = await fetch(`https://ipapi.co/${req.ip}/json/`);
     var fetch_data = await fetch_res.json()
-    console.log(`Location: ${fetch_data.city}, ${fetch_data.region}, ${fetch_data.country}`)
+    console.log(fetch_data.city, fetch_data.region, fetch_data.region_code, fetch_data.country, fetch_data.country_name, fetch_data.country_code, fetch_data.country_name, fetch_data.country_tld, fetch_data.postal, fetch_data.latitude, fetch_data.longitude, fetch_data.timezone, fetch_data.utc_offset, fetch_data.continent_code, fetch_data.in_eu, fetch_data.currency, fetch_data.currency_name, fetch_data.languages, fetch_data.asn, fetch_data.org)
+    // console.log(`Location: ${fetch_data.city}, ${fetch_data.region}, ${fetch_data.country}`)
 
     res.status(200);
-    res.header("Content-Type",'application/json');
-    res.end(JSON.stringify({status: "OK"}));
+    res.header("Content-Type", 'application/json');
+    res.end(JSON.stringify({ status: "OK" }));
 
 });
 
@@ -674,6 +676,34 @@ app.post('/api/sendResetPasswordMail', async (req, res) => {
             if (data.message_id) { res.json({ status: "ok" }) }
             else { res.json({ status: "error", error: "unable to send mail" }) }
         })
+    })
+})
+
+// get login activity of a user
+app.get('/api/getLoginActivity', auth, async function (req, res) {
+    const activities = await login_activity.find({
+        user_id: req.user._id,
+    })
+    res.json({
+        status: "ok",
+        activities: activities
+    })
+});
+
+// post api to calculate the cvss score
+app.get('/api/calculateCVSS', async (req, res) => {
+    const c = new Cvss(req.body.vector);
+    // console.log(`Base Score: ${c.getBaseScore()}, Rating: ${c.getRating()}, Impact Score: ${c.getImpactScore()}, Exploitability Score: ${c.getExploitabilityScore()}, Temporal Score: ${c.getTemporalScore()}, Environmental Score: ${c.getEnvironmentalScore()}`);
+    res.json({
+        status: "ok",
+        cvss: {
+            base_score: c.getBaseScore(),
+            rating: c.getRating(),
+            impact_score: c.getImpactScore(),
+            exploitability_score: c.getExploitabilityScore(),
+            temporal_score: c.getTemporalScore(),
+            environmental_score: c.getEnvironmentalScore(),
+        }
     })
 })
 
