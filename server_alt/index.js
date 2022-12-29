@@ -19,6 +19,9 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const speakeasy = require('speakeasy')
 const qrcode = require('qrcode')
+const geoip = require('geoip-lite');
+const fetch = require('node-fetch');
+const login_activity = require('./models/login_activity');
 
 const app = express();
 
@@ -34,6 +37,16 @@ mongoose.connect(db.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true 
     console.log("Establishing connection with MongoDB - Success");
 });
 
+async function saveLoginActivity(user_id, ip, host, browser, status) {
+    const login = new login_activity({
+        user_id: user_id,
+        ip_address: ip,
+        host: host,
+        browser: browser,
+        status: status,
+    })
+    await login.save()
+}
 
 // adding new user (sign-up route)
 app.post('/api/register', function (req, res) {
@@ -67,9 +80,6 @@ app.post('/api/login', function (req, res) {
         if (err) { console.log("err in fiding the token..."); }
         if (user) {
             // // check token's expiry
-            // console.log(user.token_validity)
-            // console.log("comparing current date", new Date(), "with token expiry date", new Date(user.token_created_at.getTime() + (2 * 60 * 1000)))
-            // console.log(new Date() < new Date(user.token_created_at.getTime() + (user.token_validity * 60 * 1000)))
             if (new Date() < new Date(user.token_created_at.getTime() + (user.token_validity * 60 * 1000))) {
                 return res.status(400).json({
                     error: true,
@@ -98,6 +108,8 @@ app.post('/api/login', function (req, res) {
                     user.generateToken((err, user) => {
                         if (err) return res.status(400).send(err);
                         console.log("saving token auth in cookies...")
+                        // update login activity
+                        saveLoginActivity(user._id, JSON.stringify(req.ip), req.headers.host, req.headers['user-agent'], true).then(() => { console.log("login activity updated. ") })
                         res.cookie('auth', user.token).json({
                             isAuth: true,
                             id: user._id,
@@ -467,6 +479,32 @@ app.get('/api/test_nesting', async function (req, res) {
     // res.json({
     //     status: "ok"
     // })
+
+    // console.log('Headers: ' + JSON.stringify(req.headers));
+    console.log('Host: ' + req.headers.host);
+    console.log('Browser: ' + req.headers['user-agent']);
+    console.log('Accept: ' + req.headers['accept']);
+    console.log('Language: ' + req.headers['accept-language']);
+    console.log('Encoding: ' + req.headers['accept-encoding']);
+    console.log('Connection: ' + req.headers['connection']);
+    console.log('Upgrade-Insecure-Requests: ' + req.headers['upgrade-insecure-requests']);
+    console.log('IP: ' + req.ip);   // ipv6 address
+    // extract ipv4 address from ipv6 address
+    var ipv4 = req.ip.split(':').pop();
+    console.log('IPv4: ' + ipv4);
+
+    // var geo = geoip.lookup(req.ip);
+    // console.log("Country: " + (geo ? geo.country: "Unknown"));
+    // console.log("Region: " + (geo ? geo.region: "Unknown"));
+    // console.log(geo);
+
+    var fetch_res = await fetch(`https://ipapi.co/${req.ip}/json/`);
+    var fetch_data = await fetch_res.json()
+    console.log(`Location: ${fetch_data.city}, ${fetch_data.region}, ${fetch_data.country}`)
+
+    res.status(200);
+    res.header("Content-Type",'application/json');
+    res.end(JSON.stringify({status: "OK"}));
 
 });
 
