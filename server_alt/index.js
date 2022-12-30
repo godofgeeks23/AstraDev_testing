@@ -22,7 +22,9 @@ const qrcode = require('qrcode')
 const fetch = require('node-fetch');
 const login_activity = require('./models/login_activity');
 const Cvss = require('cvss-calculator');
+const dotenv = require('dotenv');
 
+dotenv.config();
 const app = express();
 
 app.use(cors({ origin: 'http://localhost:3001', credentials: true, exposedHeaders: ['Set-Cookie', 'Date', 'ETag'] }))
@@ -38,12 +40,39 @@ mongoose.connect(db.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true 
 });
 
 async function saveLoginActivity(user_id, ip, host, browser, status) {
+    var ipv4 = ip.split(':').pop();
+    var fetch_res = await fetch(`https://ipapi.co/${ipv4}/json/?key=${process.env.IP_API_KEY}`);
+    var fetch_data = await fetch_res.json()
     const login = new login_activity({
         user_id: user_id,
-        ip_address: ip,
+        ip_address: ipv4,
         host: host,
         browser: browser,
         status: status,
+        city: fetch_data.city,
+        region: fetch_data.region,
+        region_code: fetch_data.region_code,
+        country: fetch_data.country,
+        country_name: fetch_data.country_name,
+        country_code: fetch_data.country_code,
+        country_code_iso3: fetch_data.country_code_iso3,
+        country_capital: fetch_data.country_capital,
+        country_tld: fetch_data.country_tld,
+        continent_code: fetch_data.continent_code,
+        in_eu: fetch_data.in_eu,
+        postal: fetch_data.postal,
+        latitude: fetch_data.latitude,
+        longitude: fetch_data.longitude,
+        timezone: fetch_data.timezone,
+        utc_offset: fetch_data.utc_offset,
+        country_calling_code: fetch_data.country_calling_code,
+        currency: fetch_data.currency,
+        currency_name: fetch_data.currency_name,
+        languages: fetch_data.languages,
+        country_area: fetch_data.country_area,
+        country_population: fetch_data.country_population,
+        asn: fetch_data.asn,
+        org: fetch_data.org,
     })
     await login.save()
 }
@@ -71,7 +100,6 @@ app.post('/api/register', function (req, res) {
         });
     });
 });
-
 
 // login user
 app.post('/api/login', function (req, res) {
@@ -109,7 +137,7 @@ app.post('/api/login', function (req, res) {
                         if (err) return res.status(400).send(err);
                         console.log("saving token auth in cookies...")
                         // update login activity
-                        saveLoginActivity(user._id, JSON.stringify(req.ip), req.headers.host, req.headers['user-agent'], true).then(() => { console.log("login activity updated. ") })
+                        saveLoginActivity(user._id, req.ip, req.headers.host, req.headers['user-agent'], true).then(() => { console.log("login activity updated. ") })
                         res.cookie('auth', user.token).json({
                             isAuth: true,
                             id: user._id,
@@ -480,33 +508,6 @@ app.get('/api/test_nesting', async function (req, res) {
     //     status: "ok"
     // })
 
-    // console.log('Headers: ' + JSON.stringify(req.headers));
-    console.log('Host: ' + req.headers.host);
-    console.log('Browser: ' + req.headers['user-agent']);
-    console.log('Accept: ' + req.headers['accept']);
-    console.log('Language: ' + req.headers['accept-language']);
-    console.log('Encoding: ' + req.headers['accept-encoding']);
-    console.log('Connection: ' + req.headers['connection']);
-    console.log('Upgrade-Insecure-Requests: ' + req.headers['upgrade-insecure-requests']);
-    console.log('IP: ' + req.ip);   // ipv6 address
-    // extract ipv4 address from ipv6 address
-    var ipv4 = req.ip.split(':').pop();
-    console.log('IPv4: ' + ipv4);
-
-    // var geo = geoip.lookup(req.ip);
-    // console.log("Country: " + (geo ? geo.country: "Unknown"));
-    // console.log("Region: " + (geo ? geo.region: "Unknown"));
-    // console.log(geo);
-
-    var fetch_res = await fetch(`https://ipapi.co/${req.ip}/json/`);
-    var fetch_data = await fetch_res.json()
-    console.log(fetch_data.city, fetch_data.region, fetch_data.region_code, fetch_data.country, fetch_data.country_name, fetch_data.country_code, fetch_data.country_name, fetch_data.country_tld, fetch_data.postal, fetch_data.latitude, fetch_data.longitude, fetch_data.timezone, fetch_data.utc_offset, fetch_data.continent_code, fetch_data.in_eu, fetch_data.currency, fetch_data.currency_name, fetch_data.languages, fetch_data.asn, fetch_data.org)
-    // console.log(`Location: ${fetch_data.city}, ${fetch_data.region}, ${fetch_data.country}`)
-
-    res.status(200);
-    res.header("Content-Type", 'application/json');
-    res.end(JSON.stringify({ status: "OK" }));
-
 });
 
 app.post('/api/createPendingUser', async (req, res) => {
@@ -663,7 +664,7 @@ app.post('/api/sendResetPasswordMail', async (req, res) => {
         body: "Reset Password",
         html: "<h1>Visit http://localhost:3001/resetpassword?email=" + req.body.destination + "&token=" + reset_token_hashed + " to reset your password.<h1>",
     }
-    fetch('https://qet85fubbi.execute-api.ap-south-1.amazonaws.com/dev/sendemail', {
+    fetch(process.env.LAMBDA_SES_ENDPOINT, {
         method: 'POST',
         // credentials: 'include',
         headers: {
@@ -708,7 +709,7 @@ app.get('/api/calculateCVSS', async (req, res) => {
 })
 
 // listening port
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.BACKEND_PORT;
 app.listen(PORT, () => {
     console.log(`Backend server is live at port ${PORT}!`);
 });
