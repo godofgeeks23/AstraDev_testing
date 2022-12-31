@@ -693,17 +693,30 @@ app.get('/api/getLoginActivity', auth, async function (req, res) {
 
 // post api to calculate the cvss score
 app.get('/api/calculateCVSS', async (req, res) => {
-    const c = new Cvss(req.body.vector);
-    // console.log(`Base Score: ${c.getBaseScore()}, Rating: ${c.getRating()}, Impact Score: ${c.getImpactScore()}, Exploitability Score: ${c.getExploitabilityScore()}, Temporal Score: ${c.getTemporalScore()}, Environmental Score: ${c.getEnvironmentalScore()}`);
+    // get first letter of each parameter
+    const av = req.body.attack_vector[0].toUpperCase();
+    const ac = req.body.attack_complexity[0].toUpperCase();
+    const pr = req.body.privileges_required[0].toUpperCase();
+    const ui = req.body.user_interaction[0].toUpperCase();
+    const s = req.body.scope[0].toUpperCase();
+    const c = req.body.confidentiality[0].toUpperCase();
+    const i = req.body.integrity[0].toUpperCase();
+    const a = req.body.availability[0].toUpperCase();
+    // create vector string
+    const vector = `CVSS:3.1/AV:${av}/AC:${ac}/PR:${pr}/UI:${ui}/S:${s}/C:${c}/I:${i}/A:${a}`
+    // create cvss object
+    const cvss = new Cvss(vector);
+    // return the cvss score
     res.json({
         status: "ok",
+        cvss_vector: vector,
         cvss: {
-            base_score: c.getBaseScore(),
-            rating: c.getRating(),
-            impact_score: c.getImpactScore(),
-            exploitability_score: c.getExploitabilityScore(),
-            temporal_score: c.getTemporalScore(),
-            environmental_score: c.getEnvironmentalScore(),
+            base_score: cvss.getBaseScore(),
+            rating: cvss.getRating(),
+            impact_score: cvss.getImpactScore(),
+            exploitability_score: cvss.getExploitabilityScore(),
+            temporal_score: cvss.getTemporalScore(),
+            environmental_score: cvss.getEnvironmentalScore(),
         }
     })
 })
