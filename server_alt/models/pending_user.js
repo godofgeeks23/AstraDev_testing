@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const validator = require('validator');
 
 const pending_user = new mongoose.Schema({
 
