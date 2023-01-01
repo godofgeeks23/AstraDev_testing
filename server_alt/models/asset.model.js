@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const validator = require('validator');
 
 const manager = new mongoose.Schema({
   mngr_id: { type: String, required: true }
