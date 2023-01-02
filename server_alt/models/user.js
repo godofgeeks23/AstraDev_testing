@@ -7,10 +7,10 @@ const salt = 10;
 
 const userSchema = new mongoose.Schema({
 
-    fname: { type: String, required: true },
-    mname: { String, required: false },
-    lname: { type: String, required: true },
-    username: { type: String, required: true, trim: true, unique: true },
+    fname: { type: String, default: null },
+    mname: { String, default: null },
+    lname: { type: String, default: null },
+    username: { type: String, trim: true, unique: true, required: true },
     email: {
         type: String, unique: true, required: true, trim: true, lowercase: true,
         validate(value) {
@@ -19,8 +19,8 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    password: { type: String, required: true },  // password
-    password2: { type: String, required: true },    // confirm password
+    password: { type: String, default: null },  // password
+    password2: { type: String, default: null },    // confirm password
     isAdmin: { type: Boolean, default: false }, // true - admin, false - user
     createdDate: { type: Date, default: Date.now }, // date of creation of user
     rating: { type: Number, default: 0 },   // rating of the user
@@ -35,7 +35,8 @@ const userSchema = new mongoose.Schema({
     two_fa_secret: { type: String, default: null }, // two factor authentication secret
     reporting_to: { type: String, default: null },  // manager id to whom this user reports
     rating: { type: Number, default: 0 },      // rating of the user
-    
+    profile_image: { type: String, default: null }, // profile image of the user
+
 
 })
 
