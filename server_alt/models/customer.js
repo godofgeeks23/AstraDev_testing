@@ -7,6 +7,7 @@ const customer = new mongoose.Schema({
   status: { type: Boolean, default: true },
   is_sec_provider: { type: Boolean, default: false },
   is_customer: { type: Boolean, default: true },
+  profile_image: { type: String, default: null },
 
 })
 
