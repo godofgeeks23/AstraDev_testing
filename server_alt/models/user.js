@@ -8,9 +8,9 @@ const salt = 10;
 const userSchema = new mongoose.Schema({
 
     fname: { type: String, default: null },
-    mname: { String, default: null },
+    mname: { type: String, default: null },
     lname: { type: String, default: null },
-    username: { type: String, trim: true, unique: true, required: true },
+    username: { type: String, trim: true, default: null },
     email: {
         type: String, unique: true, required: true, trim: true, lowercase: true,
         validate(value) {
@@ -36,7 +36,8 @@ const userSchema = new mongoose.Schema({
     reporting_to: { type: String, default: null },  // manager id to whom this user reports
     rating: { type: Number, default: 0 },      // rating of the user
     profile_image: { type: String, default: null }, // profile image of the user
-
+    activation_token: { type: String, default: null }, // activation token for the new user
+    activation_token_created_at: { type: Date, default: Date.now }, // activation token creation time
 
 })
 
