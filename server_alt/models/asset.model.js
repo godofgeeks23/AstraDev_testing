@@ -15,7 +15,7 @@ const asset = new mongoose.Schema({
   assignee_managers: { type: Array, default: [] },
   tags: { type: Array, default: [] },
   description_file: { type: String, default: null },
-  
+  rating: { type: Number, default: 0 },
   website_url: { type: String, default: null },
   postman_api_file: { type: String, default: null },
   ip_range: { type: String, default: null },
