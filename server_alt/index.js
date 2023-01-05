@@ -12,10 +12,8 @@ const role = require('./models/roles')
 const customer = require('./models/customer')
 const comment = require('./models/comment')
 const activity = require("./models/activity.model")
-const pending_user = require("./models/pending_user")
 const asset_researcher_relation = require("./models/asset_researcher_relations")
 const { ObjectId } = require('mongodb');
-const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const speakeasy = require('speakeasy')
 const qrcode = require('qrcode')
@@ -23,6 +21,7 @@ const fetch = require('node-fetch');
 const login_activity = require('./models/login_activity');
 const Cvss = require('cvss-calculator');
 const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 const app = express();
@@ -39,6 +38,7 @@ mongoose.connect(db.DATABASE, { useNewUrlParser: true, useUnifiedTopology: true 
     console.log("Establishing connection with MongoDB - Success");
 });
 
+// update login activity
 async function saveLoginActivity(user_id, ip, host, browser, status) {
     var ipv4 = ip.split(':').pop();
     var fetch_res = await fetch(`https://ipapi.co/${ipv4}/json/?key=${process.env.IP_API_KEY}`);
@@ -75,6 +75,111 @@ async function saveLoginActivity(user_id, ip, host, browser, status) {
         org: fetch_data.org,
     })
     await login.save()
+}
+
+// send email to the new user
+async function sendOnboardingMail(email, activation_token) {
+    const req_body = {
+        source: "support@cyethack.com",
+        destinations: [email],
+        subject: "Invitation to Cyethack",
+        body: "Join the Team!",
+        html: "<h1>Visit http://localhost:3001/activateuser?token=" + activation_token + " to initiate onboarding!<h1>"
+    }
+    fetch(process.env.LAMBDA_SES_ENDPOINT, {
+        method: 'POST',
+        // credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(req_body)
+    }).then((r) => {
+        r.json().then((data) => {
+            console.log("Response returned by Mailing API: ", data)
+            if (data.message_id) { return true; }
+            else { return false; }
+        })
+    })
+}
+
+// create a new pending user (invite user)
+async function createPendingUser(email, role, invited_by) {
+    try {
+        var new_user_obj = {};
+        const new_user = await User.create({
+            email: email,
+            role_id: role,
+            invited_by: invited_by,
+            status: false,
+        })
+        new_user_obj._id = new_user._id;
+        const activation_token = jwt.sign({ "data": new_user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.INVITE_TOKEN_EXPIRY) },
+            async function (err, activation_token) {
+                if (err) {
+                    console.log("Error in Activation token generation - ", err);
+                } else {
+                    console.log("Activation Token generated.");
+                    new_user.activation_token = activation_token;
+                    new_user.activation_token_created_at = Date.now();
+                    await new_user.save()
+                    // send email to the new user
+                    await sendOnboardingMail(email, activation_token);
+                    console.log(activation_token)
+                }
+            });
+        return new_user_obj;
+    }
+    catch (err) {
+        return err;
+    }
+}
+
+async function sendResetPasswordMail(email, reset_token) {
+    const req_body = {
+        source: "support@cyethack.com",
+        destinations: [email],
+        subject: "Reset Password",
+        body: "Reset Password",
+        html: "<h1>Visit http://localhost:3001/resetpassword?email=" + email + "&token=" + reset_token + " to reset your password.<h1>"
+    }
+    fetch(process.env.LAMBDA_SES_ENDPOINT, {
+        method: 'POST',
+        // credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(req_body)
+    }).then((r) => {
+        r.json().then((data) => {
+            console.log("Response returned by Mailing API: ", data)
+            if (data.message_id) { return true; }
+            else { return false; }
+        })
+    })
+}
+
+async function generateResetPasswordToken(email) {
+    try {
+        const this_user = await User.findOne({ email: email });
+        const reset_pswd_token = jwt.sign({ "data": this_user._id }, process.env.JWT_SECRET, { expiresIn: parseInt(process.env.RESET_TOKEN_EXPIRY) },
+            async function (err, reset_token) {
+                if (err) {
+                    console.log("Error in Reset password token generation - ", err);
+                } else {
+                    console.log("Reset password Token generated.");
+                    this_user.reset_password_token = reset_token;
+                    this_user.reset_password_token_created_at = Date.now();
+                    await this_user.save()
+                    // send email to the new user
+                    await sendResetPasswordMail(email, reset_token);
+                    console.log(reset_token)
+                }
+            });
+        return reset_token;
+    }
+    catch (err) {
+        return err;
+    }
 }
 
 // adding new user (sign-up route)
@@ -156,7 +261,6 @@ app.get('/api/logout', auth, function (req, res) {
         if (err) return res.status(400).send(err);
         res.sendStatus(200);
     });
-
 });
 
 // get logged in user
@@ -413,7 +517,7 @@ app.post('/api/assignAsset', auth, async (req, res) => {
 })
 
 // unassign asset from user
-app.post('/api/unassignVulnerability', auth, async (req, res) => {
+app.post('/api/unassignAsset', auth, async (req, res) => {
     // check if user is manager
     if (req.user.role_id == "100") {
         //  check if user with given researcher id exists
@@ -503,46 +607,35 @@ app.post('/api/addComment', auth, async (req, res) => {
 
 app.get('/api/test_nesting', async function (req, res) {
 
-    // console.log("can access test_nesting api if 'auth' is set to " + auth)
-    // res.json({
-    //     status: "ok"
-    // })
-
 });
 
-app.post('/api/createPendingUser', async (req, res) => {
-    console.log(req.body)
-    try {
-        const new_pending_user = await pending_user.create({
-            email: req.body.email,
-            role_id: req.body.role_id,
-            invited_by: req.body.invited_by,
-            validity: req.body.validity,
-        })
-        console.log("Pending user added! (id: ", new_pending_user.id + ")");
-        res.json({ pending_user_id: new_pending_user._id, status: "ok" })
-    } catch (error) {
-        res.json({ status: "error", error })
-    }
+app.post('/api/createPendingUser', auth, async (req, res) => {
+    const temp = await createPendingUser(req.body.email, req.body.role_id, req.user._id)
+    if (temp)
+        res.json({ pending_user_id: temp._id, status: "ok" })
+    else
+        res.json({ status: "error", error: "error" })
 })
 
 app.post('/api/validatePendingUser', async (req, res) => {
-    // console.log(req.body)
-    const thispendinguser = await pending_user.findOne({
-        _id: ObjectId(req.body.pending_user_id),
+    jwt.verify(req.body.token, process.env.JWT_SECRET, function (err, decode) {
+        if (err) res.json({ status: "error", error: err });
+        else {
+            try {
+                User.findOne({ "_id": decode.data, "activation_token": req.body.token, "email": req.body.email }, async function (err, user) {
+                    user.status = true;
+                    user.activation_token = null;
+                    await user.save();
+                    console.log("User Activated. Removed from *pending users* state...");
+                    res.json({ status: "ok" })
+                })
+            }
+            catch (err) {
+                // console.log("error:", err)
+                res.json({ status: "error", error: err })
+            }
+        }
     })
-    if (thispendinguser) {
-        // implement token time validity test here
-        console.log("Validation successful!");
-        await pending_user.remove(({ _id: ObjectId(req.body.pending_user_id) }), function (err) {
-            if (err) { console.log(err) }
-            else { console.log("User Activated. Removed from *pending users* state..."); }
-        });
-        res.json({ user: thispendinguser, status: "ok" })
-    }
-    else {
-        res.json({ status: "error" })
-    }
 })
 
 app.post('/api/resetPassword', async (req, res) => {
@@ -550,27 +643,36 @@ app.post('/api/resetPassword', async (req, res) => {
         const forgot_user = await User.findOne({
             email: req.body.email,
         })
-        const reset_token_plain = forgot_user._id + forgot_user.email;
-        const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
-        if ((reset_token_hashed === req.body.resetpswd_token) && (req.body.password === req.body.password2)) {
-            // console.log("token hash check completed")
-            bcrypt.genSalt(10, function (err, salt) {
-                if (err) return next(err);
-                bcrypt.hash(req.body.password, 10, function (err, hash) {
-                    if (err) return next(err);
-                    // next();
-                    forgot_user.password = hash;
-                    forgot_user.password2 = hash;
-                    User.findByIdAndUpdate(forgot_user._id, {
-                        password: hash,
-                        password2: hash
-                    }).then(() => { console.log("Modified records saved. Password reset successfull"); })
-                })
-            })
-            res.json({ status: "ok" })
-        }
-        else
-            res.json({ status: "error" })
+        jwt.verify(req.body.token, process.env.JWT_SECRET, function (err, decode) {
+            console.log("decode:", decode)
+            if (err) res.json({ status: "error", error: err });
+            else {
+                try {
+                    User.findOne({ "_id": decode.data, "reset_password_token": req.body.token, "email": req.body.email }, async function (err, user) {
+                        user.reset_password_token = null;
+                        bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS), function (err, salt) {
+                            if (err) return next(err);
+                            bcrypt.hash(req.body.password, parseInt(process.env.SALT_ROUNDS), function (err, hash) {
+                                if (err) return next(err);
+                                user.password = hash;
+                                user.password2 = hash;
+                                User.findByIdAndUpdate(user._id, {
+                                    password: hash,
+                                    password2: hash
+                                }).then(() => { console.log("Modified records saved. Password reset successfull"); })
+                            })
+                        })
+                        await user.save();
+                        console.log("Password changed successfully!");
+                        res.json({ status: "ok" })
+                    })
+                }
+                catch (err) {
+                    // console.log("error:", err)
+                    res.json({ status: "error", error: err })
+                }
+            }
+        })
     } catch (error) {
         res.json({ status: "error", error })
     }
@@ -615,14 +717,29 @@ app.post('/api/addTeamMember', auth, async (req, res) => {
 })
 
 // get team members of a manager
-app.get('/api/getTeamMembers', auth, async function (req, res) {
+app.get('/api/getTeamMembersAssetDetails', auth, async function (req, res) {
     if (req.user.role_id == "100") {
-        const team_members = await User.find({
-            reporting_to: req.user._id,
+        const team_members = await User.find({ reporting_to: req.user._id, })
+        var member_list = [];
+        team_members.forEach(async member => {
+            var thismember = {};
+            thismember._id = member._id;
+            thismember.fname = member.fname;
+            thismember.email = member.email;
+            thismember.profile_image = member.profile_image;
+            thismember.role = "Researcher";
+            var assets = [];
+            var asset_researcher_relations = await asset_researcher_relation.find({ researcher_id: member._id, })
+            asset_researcher_relations.forEach(async relation => {
+                var asset = await asset.findOne({ _id: relation.asset_id, }, { _id: 1, title: 1, rating: 1, description: 1 })
+                assets.push(asset)
+            })
+            thismember.assets = assets;
+            member_list.push(thismember);
         })
         res.json({
             status: "ok",
-            team_members: team_members
+            members_details: member_list
         })
     }
     else {
@@ -655,29 +772,16 @@ app.post('/api/sendResetPasswordMail', async (req, res) => {
     const forgot_user = await User.findOne({
         email: req.body.email,
     })
-    const reset_token_plain = forgot_user._id + forgot_user.email;
-    const reset_token_hashed = crypto.createHmac('sha256', reset_token_plain).digest('hex');
-    const req_body = {
-        source: "support@cyethack.com",
-        destinations: [req.body.email],
-        subject: "Password Reset Request",
-        body: "Reset Password",
-        html: "<h1>Visit http://localhost:3001/resetpassword?email=" + req.body.destination + "&token=" + reset_token_hashed + " to reset your password.<h1>",
-    }
-    fetch(process.env.LAMBDA_SES_ENDPOINT, {
-        method: 'POST',
-        // credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(req_body)
-    }).then((r) => {
-        r.json().then((data) => {
-            console.log("Response returned by Mailing API: ", data)
-            if (data.message_id) { res.json({ status: "ok" }) }
-            else { res.json({ status: "error", error: "unable to send mail" }) }
+    if (forgot_user) {
+        generateResetPasswordToken(forgot_user.email).then((token) => {
+            res.json({ status: "ok", message: "Reset password link has been sent to your email." })
+        }).catch((err) => {
+            res.json({ status: "error", error: "unable to send mail" })
         })
-    })
+    }
+    else {
+        res.json({ status: "error", error: "user not found" })
+    }
 })
 
 // get login activity of a user
@@ -720,6 +824,34 @@ app.get('/api/calculateCVSS', async (req, res) => {
         }
     })
 })
+
+// get asset list for team page
+app.post('/api/editMemberPageListAssets', auth, async function (req, res) {
+    if (req.user.role_id == "100") {
+        var assigned_assets = [];
+        var unassigned_assets = [];
+        var asset_researcher_relations = await asset_researcher_relation.find({ researcher_id: req.body.researcher_id, })
+        asset_researcher_relations.forEach(async relation => {
+            var asset = await asset.findOne({ _id: relation.asset_id, }, { _id: 1, title: 1 })
+            assigned_assets.push(asset)
+        })
+        // list all assets of manager and remove assigned assets from this list
+        const all_assets = await asset.find({ assignor_managers: req.user._id }, { _id: 1, title: 1 })
+        all_assets.forEach(asset => {
+            if (!assigned_assets.includes(asset)) {
+                unassigned_assets.push(asset)
+            }
+        })
+        res.json({
+            status: "ok",
+            assigned_assets: assigned_assets,
+            unassigned_assets: unassigned_assets
+        })
+    }
+    else {
+        res.json({ status: "error", message: "you are not authorized to view assets list" })
+    }
+});
 
 // listening port
 const PORT = process.env.BACKEND_PORT;
