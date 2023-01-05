@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
     profile_image: { type: String, default: null }, // profile image of the user
     activation_token: { type: String, default: null }, // activation token for the new user
     activation_token_created_at: { type: Date, default: Date.now }, // activation token creation time
+    reset_password_token: { type: String, default: null }, // reset password token
+    reset_password_token_created_at: { type: Date, default: Date.now }, // reset password token creation time
 
 })
 
