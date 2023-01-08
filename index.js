@@ -243,6 +243,11 @@ app.post('/api/login', function (req, res) {
                         console.log("saving token auth in cookies...")
                         // update login activity
                         saveLoginActivity(user._id, req.ip, req.headers.host, req.headers['user-agent'], true).then(() => { console.log("login activity updated. ") })
+                        // res.cookie('auth', user.token).json({
+                        //     isAuth: true,
+                        //     id: user._id,
+                        //     email: user.email
+                        // });
                         res.cookie('auth', user.token).json({
                             isAuth: true,
                             id: user._id,
@@ -324,9 +329,16 @@ app.post('/api/addAsset', auth, async (req, res) => {
             const new_asset = await asset.create({
                 title: req.body.title,
                 type: req.body.type,
-                target: req.body.target,
                 description: req.body.description,
                 assignor_managers: [req.user._id],
+                tags: req.body.tags,
+                description_file: req.body.description_file,
+                rating: req.body.rating,
+                website_url: req.body.website_url,
+                postman_api_file: req.body.postman_api_file,
+                ip_range: req.body.ip_range,
+                app_store_url: req.body.app_store_url,
+                app_file: req.body.app_file,
             })
             console.log("asset added successfully!");
 
