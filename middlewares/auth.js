@@ -1,7 +1,7 @@
 const User = require('./../models/user');
 
 let auth = (req, res, next) => {
-
+    // const token = req.header('Authorization').replace('Bearer ', '');
     let token = req.cookies.auth;
     if (!token)
         token = req.headers.cookies;
