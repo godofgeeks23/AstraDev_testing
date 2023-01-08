@@ -6,9 +6,8 @@ const manager = new mongoose.Schema({
 
 const asset = new mongoose.Schema({
 
-  title: { type: String, required: true },
   type: { type: String, required: true },
-  target: { type: String, required: true },
+  title: { type: String, required: true },
   created_date: { type: Date, default: Date.now },
   description: { type: String, default: null },
   assignor_managers: { type: Array, required: true, default: [] },
