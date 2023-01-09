@@ -284,7 +284,8 @@ app.get('/api/profile', auth, async function (req, res) {
         email: req.user.email,
         name: req.user.fname + req.user.lname,
         role_name: thisrole.role_name,
-        cname: thiscustomer.cname
+        cname: thiscustomer.cname,
+        is_sec_provider: thiscustomer.is_sec_provider,
     })
 });
 
@@ -618,7 +619,42 @@ app.post('/api/addComment', auth, async (req, res) => {
 })
 
 app.get('/api/test_nesting', async function (req, res) {
-
+    // get all users
+    var r = [];
+    const users = await User.find({})
+    // go through each user, and find his customer 
+    users.forEach(async function (user) {
+        customer.findOne({ cust_id: user.cust_id }).then(function (cust) {
+            // find his role
+            role.findOne({ role_id: user.role_id }).then(function (rol) {
+                // push all data in r array
+                r.push({
+                    id: user._id,
+                    name: user.fname + " " + user.lname,
+                    email: user.email,
+                    role_name: rol.role_name,
+                    cust: cust
+                })
+                console.log({
+                    id: user._id,
+                    name: user.fname + " " + user.lname,
+                    email: user.email,
+                    role_name: rol.role_name,
+                    cust: cust.cname
+                })
+            })
+        })
+    })
+    //     const rol = await role.findOne({ role_id: user.role_id })
+    //     r.push({
+    //         id: user._id,
+    //         name: user.fname + user.lname,
+    //         email: user.email,
+    //         role_name: rol.role_name,
+    //         cname: cust.cname
+    //     })
+    // })
+    res.json({ status: "ok", data: r }) 
 });
 
 app.post('/api/createPendingUser', auth, async (req, res) => {
